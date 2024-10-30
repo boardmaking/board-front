@@ -9,34 +9,27 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 
 const columns = [
-  { id: 'name', label: 'Name', minWidth: 170 },
-  { id: 'code', label: 'ISO\u00a0Code', minWidth: 100 },
+  { id: 'seq', label: '#', minWidth: 170 },
+  { id: 'title', label: '제목', minWidth: 100 },
   {
-    id: 'population',
-    label: 'Population',
+    id: 'writer',
+    label: '작성자',
     minWidth: 170,
     align: 'right',
     format: (value) => value.toLocaleString('en-US'),
   },
   {
-    id: 'size',
-    label: 'Size\u00a0(km\u00b2)',
+    id: 'date',
+    label: '작성일',
     minWidth: 170,
     align: 'right',
     format: (value) => value.toLocaleString('en-US'),
   },
-  {
-    id: 'density',
-    label: 'Density',
-    minWidth: 170,
-    align: 'right',
-    format: (value) => value.toFixed(2),
-  },
+
 ];
 
-function createData(name, code, population, size) {
-  const density = population / size;
-  return { name, code, population, size, density };
+function createData(seq, title, writer, date) {
+  return { seq, title, writer, date };
 }
 
 const rows = [
@@ -70,6 +63,10 @@ export default function TableComponent() {
     setPage(0);
   };
 
+  const handleClickRow = () => {
+    console.log('클릭')
+  }
+
   return (
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 440 }}>
@@ -92,11 +89,13 @@ export default function TableComponent() {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => {
                 return (
-                    <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                    <TableRow hover role="checkbox" tabIndex={-1} key={row.seq}>
                       {columns.map((column) => {
                         const value = row[column.id];
                         return (
-                            <TableCell key={column.id} align={column.align}>
+                            <TableCell key={column.id} align={column.align}
+                            onClick={handleClickRow}
+                            >
                               {column.format && typeof value === 'number'
                                   ? column.format(value)
                                   : value}
