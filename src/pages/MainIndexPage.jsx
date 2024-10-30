@@ -1,10 +1,15 @@
+import BasicLayout from "../layouts/BasicLayout.jsx";
+import MainIndexComponent from "../components/MainIndexComponent.jsx";
+import TableComponent from "../components/common/TableComponent.jsx";
 
 function MainIndexPage() {
   return (
       <div>
-        메인 페이지
+        <BasicLayout>
+          <TableComponent/>
+        </BasicLayout>
       </div>
   );
 }
 
-export default MainIndexPage;
+export default MainIndexPage
