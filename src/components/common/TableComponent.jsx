@@ -9,6 +9,8 @@ import TableRow from '@mui/material/TableRow';
 import {useLocation} from "react-router-dom";
 import {useState} from "react";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
+import {useQuery} from "@tanstack/react-query";
+import {getList} from "../../api/boardApi.js";
 
 const columns = [
   { id: 'seq', label: '#', minWidth: 170 },
@@ -55,14 +57,18 @@ const rows = [
 export default function TableComponent() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const {category} = useCustomMove()
-  const location = useLocation()
-  const search = location.state?.search
-  console.log(search)
+  const {category,search,refresh} = useCustomMove()
   console.log(category)
+  console.log(search)
+  const {data} = useQuery({
+    queryKey:['',{category,search,refresh}],
+    queryFn:()=>getList({category,search}),
+  })
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
+  console.log(data)
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
