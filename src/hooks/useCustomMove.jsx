@@ -1,26 +1,60 @@
-import {useNavigate} from "react-router-dom";
+import {
+  createSearchParams,
+  useNavigate,
+  useSearchParams
+} from "react-router-dom";
+import {useState} from "react";
+
+const getNum = (param, defaultValue) => {
+  if (!param) {
+    return defaultValue
+  }
+  return parseInt(param)
+}
 
 const useCustomMove = () => {
 
   const navigate = useNavigate()
 
-  const moveToList = () => {
-    navigate({pathname: `../list`})
-  }
+  const [refresh, setRefresh] = useState(false)
 
-  const moveToRead = (id) => {
-    navigate({pathname: `../read/${id}`})
+  const [queryParams] = useSearchParams()
+  const category = getNum(queryParams.get('category'), 1)
+
+  const queryDefault = createSearchParams({category}).toString()
+
+  const moveToList = (pageParam) => {
+
+    console.log(pageParam)
+    let queryStr =
+        ""
+    if (pageParam) {
+      const category = getNum(pageParam.category, 1)
+      queryStr = createSearchParams({category}).toString()
+    } else {
+      queryStr = queryDefault
+    }
+
+    setRefresh(!refresh)
+
+    navigate({pathname: `../`, search: queryStr},{state:{search:pageParam.search}})
   }
 
   const moveToModify = (id) => {
-    navigate({pathname: `../modify/${id}`})
+    navigate({
+      pathname: `../modify/${id}`,
+      search: queryDefault
+    })
   }
 
-  const moveToPath = (path) => {
-    navigate({pathname:`${path}`})
+  const moveToRead = (id) => {
+    navigate({
+      pathname: `../read/${id}`,
+      search: queryDefault
+    })
   }
 
-  return {moveToList, moveToRead, moveToModify, moveToPath}
+  return {moveToList, moveToModify, moveToRead, refresh}
 }
 
 export default useCustomMove

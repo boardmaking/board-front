@@ -7,6 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import {useLocation} from "react-router-dom";
 
 const columns = [
   { id: 'seq', label: '#', minWidth: 170 },
@@ -53,7 +54,9 @@ const rows = [
 export default function TableComponent() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
+  const location = useLocation()
+  const search = location.state?.search
+  console.log(search)
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };

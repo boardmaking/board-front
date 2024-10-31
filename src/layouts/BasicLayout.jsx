@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import {alpha, styled} from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -8,6 +7,9 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
+import {InputLabel, Select} from "@mui/material";
+import {useState} from "react";
+import useCustomMove from "../hooks/useCustomMove.jsx";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -51,7 +53,30 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const initState = {
+  category:'1',
+  search:''
+}
+
 export default function BasicLayout({children}) {
+
+  const [search, setSearch] = useState(initState)
+  const {moveToList} = useCustomMove()
+  const handleChangeSearch = (e) => {
+    search[e.target.name] = e.target.value
+    setSearch(search)
+  }
+
+  const handleClickSearch = (e) => {
+    moveToList(search)
+  }
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleClickSearch(event);
+    }
+  };
+
   return (
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
@@ -73,11 +98,32 @@ export default function BasicLayout({children}) {
             >
               이슈 게시판
             </Typography>
+            <InputLabel htmlFor="grouped-native-select">조건</InputLabel>
+            <Select
+                native
+                defaultValue="1"
+                id="grouped-native-select"
+                label="category"
+                name="category"
+                onChange={handleChangeSearch}
+                sx={{
+                  bgcolor: 'white', // 배경색을 하얗게 설정
+                  opacity: 0.7, // 불투명도 설정
+                  color: 'black', // 텍스트 색상을 검정색으로 설정
+                }}
+            >
+                <option value={1}>작성자</option>
+                <option value={2}>제목</option>
+                <option value={3}>내용</option>
+            </Select>
             <Search>
               <SearchIconWrapper>
-                <SearchIcon />
+                <SearchIcon/>
               </SearchIconWrapper>
               <StyledInputBase
+                  name="search"
+                  onChange={handleChangeSearch}
+                  onKeyDown={handleKeyPress}
                   placeholder="Search…"
                   inputProps={{ 'aria-label': 'search' }}
               />
