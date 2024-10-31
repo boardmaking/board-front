@@ -54,7 +54,7 @@ const useCustomMove = () => {
     })
   }
 
-  return {moveToList, moveToModify, moveToRead, refresh}
+  return {moveToList, moveToModify, moveToRead, refresh, category}
 }
 
 export default useCustomMove

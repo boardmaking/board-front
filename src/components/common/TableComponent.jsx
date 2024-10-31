@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,6 +7,8 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import {useLocation} from "react-router-dom";
+import {useState} from "react";
+import useCustomMove from "../../hooks/useCustomMove.jsx";
 
 const columns = [
   { id: 'seq', label: '#', minWidth: 170 },
@@ -52,11 +53,13 @@ const rows = [
 ];
 
 export default function TableComponent() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const {category} = useCustomMove()
   const location = useLocation()
   const search = location.state?.search
   console.log(search)
+  console.log(category)
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
