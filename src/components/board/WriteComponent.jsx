@@ -1,59 +1,85 @@
-import { useMemo, useState } from 'react';
+import {useMemo, useRef, useState} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 const formats = [
-  'font',
-  'header',
-  'bold',
-  'italic',
-  'underline',
-  'strike',
-  'blockquote',
-  'list',
-  'bullet',
-  'indent',
-  'link',
-  'align',
-  'color',
-  'background',
-  'size',
-  'h1',
+    'font',
+    'header',
+    'bold',
+    'italic',
+    'underline',
+    'strike',
+    'blockquote',
+    'list',
+    'bullet',
+    'indent',
+    'link',
+    'align',
+    'color',
+    'background',
+    'size',
+    'h1',
+    'image',
 ];
 
 const WriteComponent = () => {
-  const [values, setValues] = useState('');
+    const [values, setValues] = useState('');
+    const quillRef = useRef(null);
 
-  const modules = useMemo(() => {
-    return {
-      toolbar: {
-        container: [
-          [{ size: ['small', false, 'large', 'huge'] }],
-          [{ align: [] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ list: 'ordered' }, { list: 'bullet' }],
-          [
-            {
-              color: [],
-            },
-            { background: [] },
-          ],
-            ['image'],
-        ],
-      },
+    const imageHandler = () => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = () => {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const quill = quillRef.current.getEditor();
+                    const range = quill.getSelection();
+                    const index = range ? range.index : quill.getLength();
+
+                    quill.insertEmbed(index, 'image', reader.result);
+                    quill.setSelection(index + 1);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
     };
-  }, []);
 
-  return (
-      <ReactQuill
-          theme="snow"
-          modules={modules}
-          formats={formats}
-          onChange={setValues}
-          value={values}
-          style={{height:'500px'}}
-      />
-  );
+    const modules = useMemo(() => {
+        return {
+            toolbar: {
+                container: [
+                    [{size: ['small', false, 'large', 'huge']}],
+                    [{align: []}],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{list: 'ordered'}, {list: 'bullet'}],
+                    [{color: []}, {background: []}],
+                    ['image'],
+                ],
+                handlers: {
+                    image: imageHandler,
+                },
+            },
+        };
+    }, []);
+
+    return (
+        <div style={{height: '500px', border: '1px solid #ccc'}}>
+            <ReactQuill
+                ref={quillRef}
+                theme="snow"
+                modules={modules}
+                formats={formats}
+                onChange={setValues}
+                value={values}
+                style={{height: '100%'}}
+            />
+        </div>
+    );
 };
 
 export default WriteComponent;
