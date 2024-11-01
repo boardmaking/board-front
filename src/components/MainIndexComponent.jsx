@@ -5,17 +5,14 @@ import useCustomMove from "../hooks/useCustomMove.jsx";
 
 function MainIndexComponent() {
 
-  const {moveToPath} = useCustomMove()
-  const handleClickWrite = () => {
-    moveToPath('board/writer')
-  }
+  const {moveToWrite} = useCustomMove()
   return (
       <div>
         <BasicLayout>
           <TableComponent/>
         </BasicLayout>
         <Button
-        onClick={handleClickWrite}
+        onClick={moveToWrite}
         >글작성</Button>
       </div>
   );

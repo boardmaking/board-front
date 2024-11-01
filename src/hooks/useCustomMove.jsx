@@ -49,6 +49,10 @@ const useCustomMove = () => {
     navigate({pathname: `../`, search: queryStr})
   }
 
+  const moveToMain = () => {
+    navigate({pathname: `/`})
+  }
+
   const moveToModify = (id) => {
     navigate({
       pathname: `../modify/${id}`,
@@ -56,14 +60,25 @@ const useCustomMove = () => {
     })
   }
 
-  const moveToRead = (id) => {
+  const moveToWrite = () => {
     navigate({
-      pathname: `../read/${id}`,
-      search: queryDefault
+      pathname: `board/writer`
     })
   }
 
-  return {moveToList, moveToModify, moveToRead, refresh, category,search}
+  // const moveToRead = (id) => {
+  //   navigate({
+  //     pathname: `../read/${id}`,
+  //     search: queryDefault
+  //   })
+  // }
+
+  const moveToRead =() => {
+    navigate({
+      pathname: '../read',
+             })
+  }
+  return {moveToList, moveToWrite, moveToMain, moveToModify, moveToRead, refresh, category,search}
 }
 
 export default useCustomMove
