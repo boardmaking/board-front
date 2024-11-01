@@ -61,10 +61,10 @@ const initState = {
 export default function BasicLayout({children}) {
 
   const [search, setSearch] = useState(initState)
-  const {moveToList} = useCustomMove()
+  const {moveToList, moveToMain} = useCustomMove()
   const handleChangeSearch = (e) => {
     search[e.target.name] = e.target.value
-    setSearch(search)
+    Search(search)
   }
 
   const handleClickSearch = (e) => {
@@ -85,6 +85,7 @@ export default function BasicLayout({children}) {
                 size="large"
                 edge="start"
                 color="inherit"
+                onClick={moveToMain}
                 aria-label="open drawer"
                 sx={{ mr: 2 }}
             >

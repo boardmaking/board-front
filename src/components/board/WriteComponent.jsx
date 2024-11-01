@@ -1,6 +1,7 @@
 import {useMemo, useRef, useState} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import {Button} from "@mui/material";
 
 const formats = [
     'font',
@@ -68,6 +69,7 @@ const WriteComponent = () => {
     }, []);
 
     return (
+        <>
         <div style={{height: '500px', border: '1px solid #ccc'}}>
             <ReactQuill
                 ref={quillRef}
@@ -79,6 +81,8 @@ const WriteComponent = () => {
                 style={{height: '100%'}}
             />
         </div>
+        <Button variant="outlined" color="primary" style={{position:"relative", zIndex:'2'}}> 글작성</Button>
+        </>
     );
 };
 
