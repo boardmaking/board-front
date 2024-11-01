@@ -47,7 +47,7 @@ export default function TableComponent() {
   };
 
   const handleClickRow = (seq, title) => {
-    navigate('/board/read', {
+    navigate('/board/read/1', {
       state: { title }
     });
   };

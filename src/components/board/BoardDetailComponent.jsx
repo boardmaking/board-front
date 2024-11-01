@@ -10,10 +10,12 @@ import {
     Paper,
     TextField,
 } from "@mui/material";
-import {useLocation} from "react-router-dom";
+import {useLocation, useParams} from "react-router-dom";
 import {useState} from "react";
 import SendIcon from '@mui/icons-material/Send';
 import useCustomMove from "../../hooks/useCustomMove.jsx";
+import {useQuery} from "@tanstack/react-query";
+import {getBoard, getList} from "../../api/boardApi.js";
 
 const initialComments = [
     { id: 1, username: "댓글작성자1", content: "첫 번째 댓글입니다.", date: "2024-11-01 13:50" },
@@ -24,9 +26,16 @@ const BoardDetailComponent = () => {
     const location = useLocation();
     const {moveToMain} = useCustomMove();
     const { title = "제목이 없습니다.", content = "내용이 없습니다.", username = "정보 없음", date = "정보 없음" } = location.state || {};
+    const boardId = useParams()
 
     const [comments, setComments] = useState(initialComments);
     const [newComment, setNewComment] = useState("");
+    const {data} = useQuery({
+        queryKey:[{'boardId': boardId}],
+        queryFn:()=>getBoard(boardId.id),
+    });
+
+    console.log(data)
 
     const handleAddComment = () => {
         if (newComment.trim()) {

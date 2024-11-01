@@ -14,3 +14,8 @@ export const postBoard = async (params) => {
   console.log(params)
   return (await axios.post(`${BOARD}`, params)).data
 }
+
+export const getBoard = async (boardId) => {
+  console.log(boardId)
+  return (await axios.get(`${BOARD}/${boardId}`)).data
+}
