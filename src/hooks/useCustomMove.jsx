@@ -26,7 +26,7 @@ const useCustomMove = () => {
   const [refresh, setRefresh] = useState(false)
 
   const [queryParams] = useSearchParams()
-  const category = getNum(queryParams.get('category'), 1)
+  const category = getNum(queryParams.get('category'), '')
   const search = getString(queryParams.get('search'), '')
 
   const queryDefault = createSearchParams({category,search}).toString()
