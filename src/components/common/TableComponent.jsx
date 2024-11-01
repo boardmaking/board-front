@@ -68,7 +68,7 @@ export default function TableComponent() {
     setPage(newPage);
   };
 
-  console.log(data)
+  console.log(data?.data)
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
