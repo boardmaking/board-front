@@ -2,6 +2,8 @@ import {useMemo, useRef, useState} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {Button} from "@mui/material";
+import {useMutation} from "@tanstack/react-query";
+import {postBoard} from "../../api/boardApi.js";
 
 const formats = [
     'font',
@@ -23,10 +25,17 @@ const formats = [
     'image',
 ];
 
+const initState = {
+    email:'1',
+    title:'제목',
+    content:''
+}
+
 const WriteComponent = () => {
     const [values, setValues] = useState('');
     const quillRef = useRef(null);
-
+    const [board, setBoard] = useState(initState)
+    const boardMutation = useMutation({mutationFn:(board)=>postBoard(board)})
     const imageHandler = () => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -50,6 +59,8 @@ const WriteComponent = () => {
         };
     };
 
+
+
     const modules = useMemo(() => {
         return {
             toolbar: {
@@ -68,6 +79,14 @@ const WriteComponent = () => {
         };
     }, []);
 
+    const handleClickWrite = () => {
+        console.log(values)
+        board.content = values
+        setBoard(board)
+        console.log(board)
+        boardMutation.mutate(board)
+    }
+
     return (
         <>
         <div style={{height: '500px', border: '1px solid #ccc'}}>
@@ -81,7 +100,12 @@ const WriteComponent = () => {
                 style={{height: '100%'}}
             />
         </div>
-        <Button variant="outlined" color="primary" style={{position:"relative", zIndex:'2'}}> 글작성</Button>
+        <Button
+            variant="outlined"
+            color="primary"
+            style={{position:"relative", zIndex:'2'}}
+            onClick={handleClickWrite}
+        > 글작성</Button>
         </>
     );
 };
