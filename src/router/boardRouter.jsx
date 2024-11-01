@@ -11,7 +11,7 @@ const boardRouter = () => {
             element: <Suspense fallback={Loading}><BoardWriter/></Suspense>
         },
         {
-            path: 'read',
+            path: 'read/:id',
             element: <Suspense fallback={Loading}><BoardDetail/></Suspense>
         }
     ]

@@ -42,16 +42,12 @@ export default function TableComponent() {
         setPage(newPage);
     };
 
+
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
 
-    const handleClickRow = (title) => {
-        navigate('/board/read', {
-            state: {title}
-        });
-    };
 
     const formatDate = (dateString) => {
         try {
@@ -61,11 +57,16 @@ export default function TableComponent() {
         }
     };
 
-
     const getCurrentPageData = () => {
         if (!data?.data) return [];
         return data.data.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
     };
+
+  const handleClickRow = (seq, title) => {
+    navigate('/board/read/1', {
+      state: { title }
+    });
+  };
 
     return (
         <Paper sx={{width: '100%', overflow: 'hidden'}}>
