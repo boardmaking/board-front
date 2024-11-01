@@ -64,7 +64,7 @@ export default function BasicLayout({children}) {
   const {moveToList, moveToMain} = useCustomMove()
   const handleChangeSearch = (e) => {
     search[e.target.name] = e.target.value
-    Search(search)
+    setSearch(search)
   }
 
   const handleClickSearch = (e) => {
