@@ -9,3 +9,8 @@ export const getList = async (param) => {
     }
   })).data
 }
+
+export const postBoard = async (params) => {
+  console.log(params)
+  return (await axios.post(`${BOARD}`, params)).data
+}
