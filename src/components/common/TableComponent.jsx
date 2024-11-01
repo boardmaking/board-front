@@ -8,6 +8,9 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import {useQuery} from "@tanstack/react-query";
+import {getList} from "../../api/boardApi.js";
+import useCustomMove from "../../hooks/useCustomMove.jsx";
 
 const rows = [
   { seq: 1, title: '첫 번째 게시물', writer: '작성자1', date: '2023-11-01' },
@@ -26,7 +29,14 @@ export default function TableComponent() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const navigate = useNavigate();
+  const {category,search,refresh} = useCustomMove();
 
+  const {data} = useQuery({
+    queryKey:['',{category,search,refresh}],
+    queryFn:()=>getList({category,search}),
+  });
+
+  console.log(data)
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
