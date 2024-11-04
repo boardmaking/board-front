@@ -11,9 +11,8 @@ export const postLogin = async (loginParam) => {
   return (await axios.post(`${USER}/login`, form, header)).data
 }
 
-export const postJoin = async (memberParam) => {
-  const header = {headers: {'Content-Type': 'multipart/form-data'}}
-  return (await axios.post(`${USER}/join`, memberParam, header)).data
+export const postJoin = async (user) => {
+  return (await axios.post(`${USER}/join`, user)).data
 }
 
 export const getUser = async (email) => {
