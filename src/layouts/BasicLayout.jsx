@@ -7,9 +7,10 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import {InputLabel, Select} from "@mui/material";
+import {Button, InputLabel, Select} from "@mui/material";
 import {useState} from "react";
 import useCustomMove from "../hooks/useCustomMove.jsx";
+import {useLocation} from "react-router-dom";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -61,7 +62,9 @@ const initState = {
 export default function BasicLayout({children}) {
 
   const [search, setSearch] = useState(initState)
-  const {moveToList, moveToMain} = useCustomMove()
+  const {moveToList, moveToMain, moveToPath} = useCustomMove()
+  const location = useLocation()
+  const pathname = location.pathname
   const handleChangeSearch = (e) => {
     search[e.target.name] = e.target.value
     setSearch(search)
@@ -77,8 +80,26 @@ export default function BasicLayout({children}) {
     }
   };
 
+  const handleClickLogin = () => {
+      moveToPath('/users/login')
+  }
+
+  const handleClickJoin = () => {
+    moveToPath('/users/join')
+  }
+
   return (
       <Box sx={{ flexGrow: 1 }}>
+        {pathname==='/users/login'?
+        <></>
+            :
+        <Button onClick={handleClickLogin}>로그인하러 가기</Button>
+      }
+        {pathname==='/users/join'?
+            <></>
+            :
+        <Button onClick={handleClickJoin}>회원가입하러 가기</Button>
+        }
         <AppBar position="static">
           <Toolbar>
             <IconButton

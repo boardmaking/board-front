@@ -62,6 +62,7 @@ export default function TableComponent() {
         return data.data.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
     };
 
+
     const handleClickRow = (seq, boardId, title, username, createAt
         , content) => {
         navigate(`/boards/read/${boardId}`, {

@@ -53,6 +53,10 @@ const useCustomMove = () => {
     navigate({pathname: `/`})
   }
 
+  const moveToPath = (path) => {
+    navigate({pathname:path})
+  }
+
   const moveToModify = (id) => {
     navigate({
       pathname: `../modify/${id}`,
@@ -62,7 +66,7 @@ const useCustomMove = () => {
 
   const moveToWrite = () => {
     navigate({
-      pathname: `board/writer`
+      pathname: `boards/writer`
     })
   }
 
@@ -78,7 +82,7 @@ const useCustomMove = () => {
       pathname: '../read',
              })
   }
-  return {moveToList, moveToWrite, moveToMain, moveToModify, moveToRead, refresh, category,search}
+  return {moveToList, moveToWrite, moveToMain, moveToModify, moveToRead, moveToPath,refresh, category,search}
 }
 
 export default useCustomMove
