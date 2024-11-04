@@ -70,6 +70,7 @@ function LoginComponent() {
             noValidate
             autoComplete="off"
         >
+          <div>
         <TextFieldComponent
             id={'email'}
             name={'email'}
@@ -78,6 +79,8 @@ function LoginComponent() {
             value={user.email}
             handleChange={handleChange}
         />
+          </div>
+          <div>
         <TextFieldComponent
             auto={false}
             id={'password'}
@@ -87,6 +90,7 @@ function LoginComponent() {
             value={user.password}
             handleChange={handleChange}
         />
+          </div>
         </Box>
         <Button
         onClick={handleLogin}
