@@ -62,11 +62,16 @@ export default function TableComponent() {
         return data.data.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
     };
 
-  const handleClickRow = (seq, title) => {
-    navigate('/boards/read/1', {
-      state: { title }
-    });
-  };
+
+    const handleClickRow = (seq, boardId, title, username, createAt
+        , content) => {
+        navigate(`/boards/read/${boardId}`, {
+            state: {
+                title, createAt
+                , username, content
+            }
+        });
+    };
 
     return (
         <Paper sx={{width: '100%', overflow: 'hidden'}}>
@@ -92,7 +97,7 @@ export default function TableComponent() {
                                 role="checkbox"
                                 tabIndex={-1}
                                 key={row.id}
-                                onClick={() => handleClickRow(row.title)}
+                                onClick={() => handleClickRow(row.id, row.boardId, row.title, row.username, row.createAt, row.content)}
                                 sx={{cursor: 'pointer'}}
                             >
                                 <TableCell>{row.id}</TableCell>

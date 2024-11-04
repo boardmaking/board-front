@@ -18,14 +18,14 @@ import {useQuery} from "@tanstack/react-query";
 import {getBoard, getList} from "../../api/boardApi.js";
 
 const initialComments = [
-    { id: 1, username: "댓글작성자1", content: "첫 번째 댓글입니다.", date: "2024-11-01 13:50" },
-    { id: 2, username: "댓글작성자2", content: "두 번째 댓글입니다.", date: "2024-11-01 14:20" }
+    { id: 1, username: "댓글작성자1", content: "첫 번째 댓글입니다.", createAt: "2024-11-01 13:50" },
+    { id: 2, username: "댓글작성자2", content: "두 번째 댓글입니다.", createAt: "2024-11-01 14:20" }
 ];
 
 const BoardDetailComponent = () => {
     const location = useLocation();
     const {moveToMain} = useCustomMove();
-    const { title = "제목이 없습니다.", content = "내용이 없습니다.", username = "정보 없음", date = "정보 없음" } = location.state || {};
+    const { title = "제목이 없습니다.", content = "내용이 없습니다.", username = "정보 없음", createAt = "정보 없음" } = location.state || {};
     const boardId = useParams()
 
     const [comments, setComments] = useState(initialComments);
@@ -43,7 +43,7 @@ const BoardDetailComponent = () => {
                 id: comments.length + 1,
                 username: "현재 사용자",
                 content: newComment,
-                date: new Date().toLocaleString()
+                createAt: new Date().toLocaleString()
             };
             setComments(prev => [...prev, newCommentData]);
             setNewComment("");
@@ -56,7 +56,7 @@ const BoardDetailComponent = () => {
                 <h2>{title}</h2>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', color: 'text.secondary', marginBottom: 2 }}>
                     <span>작성자: {username}</span>
-                    <span>작성일: {date}</span>
+                    <span>작성일: {createAt}</span>
                 </Box>
                 <Divider sx={{ margin: '20px 0' }} />
                 <p>{content}</p>
