@@ -42,36 +42,60 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   width: '100%',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     [theme.breakpoints.up('sm')]: {
-      width: '12ch',
+      width: '14ch',
       '&:focus': {
-        width: '20ch',
+        width: '22ch',
       },
     },
   },
 }));
 
+const StyledButton = styled(Button)(({ theme }) => ({
+  margin: theme.spacing(1),
+  color: theme.palette.primary.main,
+  borderColor: theme.palette.primary.main,
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+  },
+}));
+
+const StyledSelect = styled(Select)(({ theme }) => ({
+  backgroundColor: 'white',
+  opacity: 0.9,
+  color: 'black',
+  marginRight: theme.spacing(2),
+  minWidth: 120,
+  '& .MuiSelect-select': {
+    padding: theme.spacing(1),
+  },
+}));
+
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  backgroundColor: '#1976d2',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+}));
+
 const initState = {
-  category:'1',
-  search:''
+  category: '1',
+  search: ''
 }
 
-export default function BasicLayout({children}) {
+export default function BasicLayout({ children }) {
+  const [search, setSearch] = useState(initState);
+  const { moveToList, moveToMain, moveToPath } = useCustomMove();
+  const location = useLocation();
+  const pathname = location.pathname;
 
-  const [search, setSearch] = useState(initState)
-  const {moveToList, moveToMain, moveToPath} = useCustomMove()
-  const location = useLocation()
-  const pathname = location.pathname
   const handleChangeSearch = (e) => {
-    search[e.target.name] = e.target.value
-    setSearch(search)
+    search[e.target.name] = e.target.value;
+    setSearch(search);
   }
 
   const handleClickSearch = (e) => {
-    moveToList(search)
+    moveToList(search);
   }
 
   const handleKeyPress = (event) => {
@@ -81,26 +105,28 @@ export default function BasicLayout({children}) {
   };
 
   const handleClickLogin = () => {
-      moveToPath('/users/login')
+    moveToPath('/users/login');
   }
 
   const handleClickJoin = () => {
-    moveToPath('/users/join')
+    moveToPath('/users/join');
   }
 
   return (
-      <Box sx={{ flexGrow: 1 }}>
-        {pathname==='/users/login'?
-        <></>
-            :
-        <Button onClick={handleClickLogin}>로그인하러 가기</Button>
-      }
-        {pathname==='/users/join'?
-            <></>
-            :
-        <Button onClick={handleClickJoin}>회원가입하러 가기</Button>
-        }
-        <AppBar position="static">
+      <Box sx={{ flexGrow: 1, minHeight: '100vh' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: 1, gap: 1 }}>
+          {pathname !== '/users/login' && (
+              <StyledButton variant="outlined" onClick={handleClickLogin}>
+                로그인하러 가기
+              </StyledButton>
+          )}
+          {pathname !== '/users/join' && (
+              <StyledButton variant="outlined" onClick={handleClickJoin}>
+                회원가입하러 가기
+              </StyledButton>
+          )}
+        </Box>
+        <StyledAppBar position="static" sx={{ borderRadius: '2px' }}>
           <Toolbar>
             <IconButton
                 size="large"
@@ -108,7 +134,7 @@ export default function BasicLayout({children}) {
                 color="inherit"
                 onClick={moveToMain}
                 aria-label="open drawer"
-                sx={{ mr: 2 }}
+                sx={{ mr: 2, '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}
             >
               <MenuIcon />
             </IconButton>
@@ -116,31 +142,31 @@ export default function BasicLayout({children}) {
                 variant="h6"
                 noWrap
                 component="div"
-                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' }, fontWeight: 600, letterSpacing: '0.5px' }}
             >
               이슈 게시판
             </Typography>
-            <InputLabel htmlFor="grouped-native-select">조건</InputLabel>
-            <Select
+            <InputLabel
+                htmlFor="grouped-native-select"
+                sx={{ color: 'white', marginRight: 1, fontSize: '0.9rem' }}
+            >
+              조건
+            </InputLabel>
+            <StyledSelect
                 native
                 defaultValue="1"
                 id="grouped-native-select"
                 label="category"
                 name="category"
                 onChange={handleChangeSearch}
-                sx={{
-                  bgcolor: 'white', // 배경색을 하얗게 설정
-                  opacity: 0.7, // 불투명도 설정
-                  color: 'black', // 텍스트 색상을 검정색으로 설정
-                }}
             >
-                <option value={1}>작성자</option>
-                <option value={2}>제목</option>
-                <option value={3}>내용</option>
-            </Select>
+              <option value={1}>작성자</option>
+              <option value={2}>제목</option>
+              <option value={3}>내용</option>
+            </StyledSelect>
             <Search>
               <SearchIconWrapper>
-                <SearchIcon/>
+                <SearchIcon />
               </SearchIconWrapper>
               <StyledInputBase
                   name="search"
@@ -151,8 +177,10 @@ export default function BasicLayout({children}) {
               />
             </Search>
           </Toolbar>
-        </AppBar>
-        {children}
+        </StyledAppBar>
+        <Box sx={{ padding: 3 }}>
+          {children}
+        </Box>
       </Box>
   );
 }
