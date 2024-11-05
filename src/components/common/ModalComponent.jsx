@@ -15,7 +15,13 @@ const style = {
   p: 4,
 };
 
-export default function ModalComponent({title,content,handleClose,open}) {
+export default function ModalComponent({title, content, handleClose, open}) {
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleClose();
+    }
+  };
+
   return (
       <div>
         <Modal
@@ -23,6 +29,7 @@ export default function ModalComponent({title,content,handleClose,open}) {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
             open={open}
+            onKeyDown={handleKeyDown}
         >
           <Box sx={style}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -31,9 +38,15 @@ export default function ModalComponent({title,content,handleClose,open}) {
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>
               {content}
             </Typography>
-            <Button
-                onClick={handleClose}
-            >확인</Button>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                  variant="contained"
+                  onClick={handleClose}
+                  autoFocus
+              >
+                확인
+              </Button>
+            </Box>
           </Box>
         </Modal>
       </div>
