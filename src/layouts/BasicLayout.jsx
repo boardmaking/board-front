@@ -8,9 +8,10 @@ import InputBase from '@mui/material/InputBase';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import {Button, InputLabel, Select} from "@mui/material";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import useCustomMove from "../hooks/useCustomMove.jsx";
 import {useLocation} from "react-router-dom";
+import {getCookie} from "../util/cookieUtil.jsx";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -84,10 +85,16 @@ const initState = {
 }
 
 export default function BasicLayout({ children }) {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [search, setSearch] = useState(initState);
   const { moveToList, moveToMain, moveToPath } = useCustomMove();
   const location = useLocation();
   const pathname = location.pathname;
+
+  useEffect(() => {
+    const userCookie = getCookie('user');
+    setIsLoggedIn(!!userCookie);
+  }, []);
 
   const handleChangeSearch = (e) => {
     search[e.target.name] = e.target.value;
