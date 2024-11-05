@@ -11,7 +11,7 @@ import {Button, InputLabel, Select} from "@mui/material";
 import {useEffect, useState} from "react";
 import useCustomMove from "../hooks/useCustomMove.jsx";
 import {useLocation} from "react-router-dom";
-import {getCookie} from "../util/cookieUtil.jsx";
+import useCustomLogin from "../hooks/useCustomLogin.jsx";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -88,17 +88,34 @@ export default function BasicLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [search, setSearch] = useState(initState);
   const { moveToList, moveToMain, moveToPath } = useCustomMove();
+  const {doLogout} = useCustomLogin();
   const location = useLocation();
   const pathname = location.pathname;
 
   useEffect(() => {
-    const userCookie = getCookie('user');
-    setIsLoggedIn(!!userCookie);
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('user='));
+
+    if (cookieValue) {
+      const userInfo = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+      setIsLoggedIn(true);
+      console.log(userInfo)
+    } else {
+      setIsLoggedIn(false);
+      console.log("@"+isLoggedIn);
+    }
   }, []);
 
   const handleChangeSearch = (e) => {
     search[e.target.name] = e.target.value;
     setSearch(search);
+  }
+
+  const handleClickLogout = () => {
+    doLogout();
+    setIsLoggedIn(false);
+    moveToMain();
   }
 
   const handleClickSearch = (e) => {
@@ -122,15 +139,23 @@ export default function BasicLayout({ children }) {
   return (
       <Box sx={{ flexGrow: 1, minHeight: '100vh' }}>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: 1, gap: 1 }}>
-          {pathname !== '/users/login' && (
-              <StyledButton variant="outlined" onClick={handleClickLogin}>
-                로그인하러 가기
+          {isLoggedIn ? (
+              <StyledButton variant="outlined" onClick={handleClickLogout}>
+                로그아웃
               </StyledButton>
-          )}
-          {pathname !== '/users/join' && (
-              <StyledButton variant="outlined" onClick={handleClickJoin}>
-                회원가입하러 가기
-              </StyledButton>
+          ) : (
+              <>
+                {pathname !== '/users/login' && (
+                    <StyledButton variant="outlined" onClick={handleClickLogin}>
+                      로그인하러 가기
+                    </StyledButton>
+                )}
+                {pathname !== '/users/join' && (
+                    <StyledButton variant="outlined" onClick={handleClickJoin}>
+                      회원가입하러 가기
+                    </StyledButton>
+                )}
+              </>
           )}
         </Box>
         <StyledAppBar position="static" sx={{ borderRadius: '2px' }}>
