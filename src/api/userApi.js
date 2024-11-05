@@ -3,12 +3,19 @@ import axios from "axios";
 import jwtAxios from "../util/jwtUtil.jsx";
 
 export const postLogin = async (loginParam) => {
-  const header = {headers: {"Content-Type": "x-www-form-urlencoded"}}
-  const form = new FormData()
-  form.append('username', loginParam.email)
-  form.append('password', loginParam.password)
+  const header = { headers: { "Content-Type": "application/x-www-form-urlencoded" }};
+  const form = new FormData();
+  form.append('username', loginParam.email);
+  form.append('password', loginParam.password);
 
-  return (await axios.post(`${USER}/login`, form, header)).data
+  const response = await axios.post(`${USER}/login`, form, header);
+
+  const token = response.data.accessToken;
+
+  localStorage.setItem('token', token);
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+  return response.data;
 }
 
 export const postJoin = async (user) => {

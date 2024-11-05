@@ -1,9 +1,11 @@
-import {useMemo, useRef, useState} from 'react';
+import {useMemo, useRef, useState, useEffect} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import {Button} from "@mui/material";
+import {Button, TextField} from "@mui/material";
 import {useMutation} from "@tanstack/react-query";
 import {postBoard} from "../../api/boardApi.js";
+import TextFieldComponent from "../common/TextFieldComponent.jsx";
+import useCustomMove from "../../hooks/useCustomMove.jsx";
 
 const formats = [
     'font',
@@ -25,17 +27,40 @@ const formats = [
     'image',
 ];
 
-const initState = {
-    email:'1',
-    title:'제목',
-    content:''
-}
-
 const WriteComponent = () => {
+    const {moveToMain} = useCustomMove();
     const [values, setValues] = useState('');
     const quillRef = useRef(null);
-    const [board, setBoard] = useState(initState)
-    const boardMutation = useMutation({mutationFn:(board)=>postBoard(board)})
+    const [board, setBoard] = useState({
+        email: '',
+        title: '',
+        content: '',
+        username: ''
+    });
+    const boardMutation = useMutation({mutationFn:(board)=>postBoard(board)});
+
+    useEffect(() => {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('user='));
+
+        if (cookieValue) {
+            const userInfo = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+            setBoard(prevBoard => ({
+                ...prevBoard,
+                email: userInfo.email,
+                username: userInfo.username
+            }));
+        }
+    }, []);
+
+    const handleTitleChange = (event) => {
+        setBoard({
+            ...board,
+            title: event.target.value
+        });
+    };
+
     const imageHandler = () => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -59,8 +84,6 @@ const WriteComponent = () => {
         };
     };
 
-
-
     const modules = useMemo(() => {
         return {
             toolbar: {
@@ -80,33 +103,75 @@ const WriteComponent = () => {
     }, []);
 
     const handleClickWrite = () => {
-        console.log(values)
-        board.content = values
-        setBoard(board)
-        console.log(board)
-        boardMutation.mutate(board)
+        if (!board.title.trim()) {
+            alert('제목을 입력해주세요.');
+            return;
+        }
+
+        if (!values.trim()) {
+            alert('내용을 입력해주세요.');
+            return;
+        }
+
+        const updatedBoard = {
+            ...board,
+            content: values
+        };
+
+        boardMutation.mutate(updatedBoard, {
+            onSuccess: () => {
+                moveToMain();
+            },
+            onError: (error) => {
+                console.error('작성 실패:', error);
+            }
+        });
     }
 
     return (
-        <>
-        <div style={{height: '500px', border: '1px solid #ccc'}}>
-            <ReactQuill
-                ref={quillRef}
-                theme="snow"
-                modules={modules}
-                formats={formats}
-                onChange={setValues}
-                value={values}
-                style={{height: '100%'}}
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
+            <TextFieldComponent
+                label="작성자"
+                value={board.username}
+                InputProps={{
+                    readOnly: true,
+                }}
+                variant="outlined"
+                fullWidth
             />
+
+            <TextField
+                style={{marginTop:10}}
+                label="제목"
+                value={board.title}
+                onChange={handleTitleChange}
+                variant="outlined"
+                fullWidth
+                required
+                placeholder="제목을 입력해주세요"
+            />
+
+            <div style={{height: '500px', border: '1px solid #ccc'}}>
+                <ReactQuill
+                    ref={quillRef}
+                    theme="snow"
+                    modules={modules}
+                    formats={formats}
+                    onChange={setValues}
+                    value={values}
+                    style={{height: '100%'}}
+                />
+            </div>
+
+            <Button
+                variant="outlined"
+                color="primary"
+                style={{position:"relative", zIndex:'2'}}
+                onClick={handleClickWrite}
+            >
+                글작성
+            </Button>
         </div>
-        <Button
-            variant="outlined"
-            color="primary"
-            style={{position:"relative", zIndex:'2'}}
-            onClick={handleClickWrite}
-        > 글작성</Button>
-        </>
     );
 };
 
