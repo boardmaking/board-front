@@ -1,10 +1,13 @@
 import {useState} from 'react';
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
-import {Box, Button} from "@mui/material";
+import {Avatar, Box, Button, Container} from "@mui/material";
 import {useMutation} from "@tanstack/react-query";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import ModalComponent from "../common/ModalComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 
 const initState = {
     email: '',
@@ -52,7 +55,7 @@ function LoginComponent() {
     }
 
     return (
-        <div>
+        <Container component="main" maxWidth="xs">
             {result ? <ModalComponent
                     open={success}
                     title={`안녕하세요 ${result}, 님`}
@@ -67,14 +70,39 @@ function LoginComponent() {
                 content={'아이디와 비밀번호를 다시 확인해주세요'}
                 handleClose={handleClose}
             /> : <></>}
-            <Box
-                component="form"
-                sx={{'& .MuiTextField-root': {m: 1, width: '25ch'}}}
-                noValidate
-                autoComplete="off"
-                onSubmit={handleLogin}
+
+            <Paper
+                elevation={3}
+                sx={{
+                    marginTop: 8,
+                    padding: 4,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
             >
-                <div>
+                <Avatar sx={{
+                    margin: 1,
+                    backgroundColor: 'secondary.main',
+                    width: 56,
+                    height: 56
+                }}>
+                    <LockOutlinedIcon fontSize="large"/>
+                </Avatar>
+
+                <Typography component="h1" variant="h5" sx={{marginBottom: 3}}>
+                    로그인
+                </Typography>
+
+                <Box
+                    component="form"
+                    onSubmit={handleLogin}
+                    sx={{
+                        width: '100%',
+                        marginTop: 1,
+                        '& .MuiTextField-root': {marginBottom: 2},
+                    }}
+                >
                     <TextFieldComponent
                         id={'email'}
                         name={'email'}
@@ -82,9 +110,8 @@ function LoginComponent() {
                         label={'이메일'}
                         value={user.email}
                         handleChange={handleChange}
+                        fullWidth
                     />
-                </div>
-                <div>
                     <TextFieldComponent
                         auto={false}
                         id={'password'}
@@ -93,13 +120,25 @@ function LoginComponent() {
                         label={'비밀번호'}
                         value={user.password}
                         handleChange={handleChange}
+                        fullWidth
                     />
-                </div>
-                <Button type="submit">
-                    로그인
-                </Button>
-            </Box>
-        </div>
+
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{
+                            marginTop: 3,
+                            marginBottom: 2,
+                            padding: 1.5,
+                            fontSize: '1.1rem'
+                        }}
+                    >
+                        로그인
+                    </Button>
+                </Box>
+            </Paper>
+        </Container>
     );
 }
 
