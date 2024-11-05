@@ -14,8 +14,9 @@ import {useLocation, useParams} from "react-router-dom";
 import {useState} from "react";
 import SendIcon from '@mui/icons-material/Send';
 import useCustomMove from "../../hooks/useCustomMove.jsx";
-import {useQuery} from "@tanstack/react-query";
-import {getBoard} from "../../api/boardApi.js";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {getBoard, postDeleteBoard} from "../../api/boardApi.js";
+import {getCookie} from "../../util/cookieUtil.jsx";
 
 const initialComments = [
     {id: 1, username: "댓글작성자1", content: "첫 번째 댓글입니다.", createAt: "2024-11-01 13:50"},
@@ -26,14 +27,33 @@ const BoardDetailComponent = () => {
     const location = useLocation();
     const {moveToMain} = useCustomMove();
     const {title = "제목이 없습니다.", content = "내용이 없습니다.", username = "정보 없음", createAt = "정보 없음"} = location.state || {};
-    const boardId = useParams()
-
+    const {id: boardId} = useParams();
     const [comments, setComments] = useState(initialComments);
     const [newComment, setNewComment] = useState("");
-    const {data} = useQuery({
-        queryKey: [{'boardId': boardId}],
-        queryFn: () => getBoard(boardId.id),
+    const userInfo = getCookie('user');
+
+    const boardMutation = useMutation({
+        mutationFn: postDeleteBoard,
+        onSuccess: () => {
+            alert("삭제되었습니다.")
+            moveToMain();
+        },
+        onError: () => {
+            alert("본인만 삭제할 수 있습니다.")
+        }
     });
+
+    const {data} = useQuery({
+        queryKey: ['board', boardId],
+        queryFn: () => getBoard(boardId),
+    });
+
+    const handleClickDelete = () => {
+        boardMutation.mutate({
+            userId: userInfo.id,
+            boardId: boardId
+        });
+    }
 
     console.log(data)
 
@@ -76,7 +96,7 @@ const BoardDetailComponent = () => {
                 <Box sx={{display: 'flex', justifyContent: 'flex-end', gap: 1, marginTop: 3}}>
                     <Button onClick={moveToMain} variant="outlined" color="primary">목록</Button>
                     <Button variant="outlined" color="primary">수정</Button>
-                    <Button variant="outlined" color="error">삭제</Button>
+                    <Button onClick={handleClickDelete} variant="outlined" color="error">삭제</Button>
                 </Box>
             </Paper>
 

@@ -19,3 +19,8 @@ export const getBoard = async (boardId) => {
   console.log(boardId)
   return (await axios.get(`${BOARD}/${boardId}`)).data
 }
+
+export const postDeleteBoard = async (params) => {
+  console.log(params)
+  return (await axios.post(`${BOARD}/delete`, params)).data
+}
