@@ -1,9 +1,9 @@
-import {useMemo, useRef, useState, useEffect} from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import {Button, TextField} from "@mui/material";
-import {useMutation} from "@tanstack/react-query";
-import {postBoard} from "../../api/boardApi.js";
+import { Button, TextField } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
+import { postBoard } from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 
@@ -28,16 +28,17 @@ const formats = [
 ];
 
 const WriteComponent = () => {
-    const {moveToMain} = useCustomMove();
+    const { moveToMain } = useCustomMove();
     const [values, setValues] = useState('');
     const quillRef = useRef(null);
+    const titleRef = useRef(null);
     const [board, setBoard] = useState({
         email: '',
         title: '',
         content: '',
         username: ''
     });
-    const boardMutation = useMutation({mutationFn:(board)=>postBoard(board)});
+    const boardMutation = useMutation({ mutationFn: (board) => postBoard(board) });
 
     useEffect(() => {
         const cookieValue = document.cookie
@@ -52,6 +53,8 @@ const WriteComponent = () => {
                 username: userInfo.username
             }));
         }
+
+        titleRef.current?.focus();
     }, []);
 
     const handleTitleChange = (event) => {
@@ -88,11 +91,11 @@ const WriteComponent = () => {
         return {
             toolbar: {
                 container: [
-                    [{size: ['small', false, 'large', 'huge']}],
-                    [{align: []}],
+                    [{ size: ['small', false, 'large', 'huge'] }],
+                    [{ align: [] }],
                     ['bold', 'italic', 'underline', 'strike'],
-                    [{list: 'ordered'}, {list: 'bullet'}],
-                    [{color: []}, {background: []}],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    [{ color: [] }, { background: [] }],
                     ['image'],
                 ],
                 handlers: {
@@ -141,7 +144,8 @@ const WriteComponent = () => {
             />
 
             <TextField
-                style={{marginTop:10}}
+                ref={titleRef}
+                style={{ marginTop: 10 }}
                 label="제목"
                 value={board.title}
                 onChange={handleTitleChange}
@@ -149,9 +153,10 @@ const WriteComponent = () => {
                 fullWidth
                 required
                 placeholder="제목을 입력해주세요"
+                autoFocus
             />
 
-            <div style={{height: '500px', border: '1px solid #ccc'}}>
+            <div style={{ height: '500px', border: '1px solid #ccc' }}>
                 <ReactQuill
                     ref={quillRef}
                     theme="snow"
@@ -159,14 +164,14 @@ const WriteComponent = () => {
                     formats={formats}
                     onChange={setValues}
                     value={values}
-                    style={{height: '100%'}}
+                    style={{ height: '100%' }}
                 />
             </div>
 
             <Button
                 variant="outlined"
                 color="primary"
-                style={{position:"relative", zIndex:'2'}}
+                style={{ position: "relative", zIndex: '2' }}
                 onClick={handleClickWrite}
             >
                 글작성
