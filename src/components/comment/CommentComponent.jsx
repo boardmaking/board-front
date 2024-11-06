@@ -12,25 +12,37 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import {useEffect, useState} from "react";
-import {useMutation, useQuery} from "@tanstack/react-query";
-import {postComment} from "../../api/commentApi.js";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {postComment, getList} from "../../api/commentApi.js";
 import {getBoard} from "../../api/boardApi.js";
 import {useParams} from "react-router-dom";
 
-const initialComments = [
-    {id: 1, username: "댓글작성자1", content: "첫 번째 댓글입니다.", createAt: '11월 6일'},
-];
-
 function CommentComponent() {
-    const [comments, setComments] = useState(initialComments);
     const [values, setValues] = useState('');
     const [userInfo, setUserInfo] = useState(null);
-    const commentMutation = useMutation({mutationFn:(comments)=>postComment(comments)});
     const {id: boardId} = useParams();
+    const queryClient = useQueryClient();
 
-    const {data} = useQuery({
+    const commentMutation = useMutation({
+        mutationFn: (comment) => postComment(comment),
+        onSuccess: () => {
+            alert("작성 성공");
+            queryClient.invalidateQueries(['comments', boardId]);
+            setValues("");
+        },
+        onError: (error) => {
+            console.error('작성 실패:', error);
+        }
+    });
+
+    const {data: boardData} = useQuery({
         queryKey: ['board', boardId],
         queryFn: () => getBoard(boardId.toString()),
+    });
+
+    const {data: commentList = []} = useQuery({
+        queryKey: ['comments', boardId],
+        queryFn: () => getList(boardId.toString()),
     });
 
     useEffect(() => {
@@ -45,53 +57,41 @@ function CommentComponent() {
     }, []);
 
     const handleAddComment = () => {
-        if (values.trim() && userInfo) {
-            const newCommentData = {
-                id: comments.length + 1,
-                username: userInfo.username,
-                content: values,
-                createAt: comments.createAt
-            };
-            setComments(prev => [...prev, newCommentData]);
-            setValues("");
+        if (!userInfo) {
+            alert("댓글을 작성하려면 로그인이 필요합니다.");
+            return;
         }
 
-        const updatedComment = {
-            ...comments,
-            content: values,
-            userId: userInfo.id,
-            boardId: boardId.toString()
-        };
+        if (values.trim() && userInfo) {
+            const newCommentData = {
+                content: values,
+                userId: userInfo.id,
+                boardId: boardId.toString(),
+            };
 
-        commentMutation.mutate(updatedComment, {
-            onSuccess: () => {
-                alert("작성 성공")
-            },
-            onError: (error) => {
-                console.error('작성 실패:', error);
-            }
-        })
+            commentMutation.mutate(newCommentData);
+        }
     };
 
     return (
         <Paper elevation={3} sx={{padding: 3}}>
-            <h3>댓글 ({comments.length})</h3>
+            <h3>댓글 ({commentList.length})</h3>
             <List>
-                {comments.map(({id, username, content, createAt}) => (
+                {commentList.map(({id, username, content, createAt}) => (
                     <Box key={id}>
                         <ListItem alignItems="flex-start">
                             <ListItemAvatar>
                                 <Avatar>{username[0]}</Avatar>
                             </ListItemAvatar>
                             <ListItemText
-                                primary={
+                                primary={(
                                     <Box sx={{display: 'flex', justifyContent: 'space-between'}}>
                                         <span>{username}</span>
                                     </Box>
-                                }
+                                )}
                                 secondary={content}
                             />
-                            <ListItemText>{createAt}</ListItemText>
+                            <ListItemText secondary={createAt}/>
                         </ListItem>
                         <Divider variant="inset" component="li"/>
                     </Box>
@@ -103,15 +103,17 @@ function CommentComponent() {
                     fullWidth
                     multiline
                     rows={2}
-                    placeholder="댓글을 입력하세요"
+                    placeholder={userInfo ? "댓글을 입력하세요" : "댓글을 작성하려면 로그인이 필요합니다"}
                     value={values}
                     onChange={(e) => setValues(e.target.value)}
                     size="small"
+                    disabled={!userInfo}
                 />
                 <Button
                     variant="contained"
                     endIcon={<SendIcon sx={{marginRight: 1}}/>}
                     onClick={handleAddComment}
+                    disabled={!userInfo}
                 >
                 </Button>
             </Box>
