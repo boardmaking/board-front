@@ -84,11 +84,20 @@ const initState = {
   search: ''
 }
 
+const UserInfoTypography = styled(Typography)(({ theme }) => ({
+  marginRight: theme.spacing(2),
+  color: theme.palette.primary.main,
+  display: 'flex',
+  alignItems: 'center',
+  fontWeight: 500
+}));
+
 export default function BasicLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [search, setSearch] = useState(initState);
   const { moveToList, moveToMain, moveToPath } = useCustomMove();
   const {doLogout} = useCustomLogin();
+  const [userInfo, setUserInfo] = useState(null);
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -98,12 +107,9 @@ export default function BasicLayout({ children }) {
         .find(row => row.startsWith('user='));
 
     if (cookieValue) {
-      const userInfo = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+      const user = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+      setUserInfo(user);
       setIsLoggedIn(true);
-      console.log(userInfo)
-    } else {
-      setIsLoggedIn(false);
-      console.log("@"+isLoggedIn);
     }
   }, []);
 
@@ -139,10 +145,15 @@ export default function BasicLayout({ children }) {
   return (
       <Box sx={{ flexGrow: 1, minHeight: '100vh' }}>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: 1, gap: 1 }}>
-          {isLoggedIn ? (
-              <StyledButton variant="outlined" onClick={handleClickLogout}>
-                로그아웃
-              </StyledButton>
+          {isLoggedIn && userInfo ? (
+              <>
+                <UserInfoTypography variant="subtitle1">
+                  {userInfo.username}님 환영합니다
+                </UserInfoTypography>
+                <StyledButton variant="outlined" onClick={handleClickLogout}>
+                  로그아웃
+                </StyledButton>
+              </>
           ) : (
               <>
                 {pathname !== '/users/login' && (
