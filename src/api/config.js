@@ -1,4 +1,4 @@
-export const API_SERVER_HOST = 'http://localhost:8080'
+export const API_SERVER_HOST = 'http://localhost:8081'
 
 export const USER = `${API_SERVER_HOST}/users`
 
