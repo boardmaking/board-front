@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import { postBoard } from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
+import {toast} from "react-toastify";
 
 const formats = [
     'font',
@@ -123,6 +124,7 @@ const WriteComponent = () => {
 
         boardMutation.mutate(updatedBoard, {
             onSuccess: () => {
+                toast.success("글이 작성되었습니다.");
                 moveToMain();
             },
             onError: (error) => {
