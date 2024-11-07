@@ -24,8 +24,11 @@ function LoginComponent() {
     const [result, setResult] = useState(null)
 
     const handleChange = (e) => {
-        user[e.target.name] = e.target.value
-        setUser({...user})
+        const { name, value } = e.target;
+        setUser(prevUser => ({
+            ...prevUser,
+            [name]: value
+        }));
     }
 
     const handleLogin = (e) => {
