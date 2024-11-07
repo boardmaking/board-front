@@ -56,12 +56,9 @@ function JoinComponent() {
         if (!email) {
             return '이메일을 입력해주세요'
         }
-        if (!email.includes('@')) {
-            return '이메일에는 @가 포함되어야 합니다'
-        }
-        const [localPart, domain] = email.split('@')
-        if (!localPart || !domain) {
-            return '올바른 이메일 형식이 아닙니다'
+        const emailPattern = /[a-z0-9]+@[a-z]+\.[a-z]{2,3}/
+        if (!emailPattern.test(email)) {
+            return '이메일 형식은 email@???.??? 또는 email@???.??과 같습니다.'
         }
         return ''
     }
@@ -70,8 +67,9 @@ function JoinComponent() {
         if (!password) {
             return '비밀번호를 입력해주세요'
         }
-        if (password.length < 6) {
-            return '비밀번호는 6자 이상이어야 합니다'
+        const passwordPattern = /^(?=.*[0-9])(?=.*[a-zA-Z])[a-zA-Z0-9!@#$%^&*()._-]{6,16}$/
+        if (!passwordPattern.test(password)) {
+            return '비밀번호는 6자 이상 16자 이하, 영문과 숫자를 포함해야 합니다.'
         }
         return ''
     }
@@ -80,8 +78,9 @@ function JoinComponent() {
         if (!username) {
             return '유저명을 입력해주세요'
         }
-        if (username.length < 2) {
-            return '유저명은 2자 이상이어야 합니다'
+        const usernamePattern = /^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$/
+        if (!usernamePattern.test(username)) {
+            return '유저명은 2자 이상 16자 이하, 영어 또는 숫자 또는 한글로 구성되어야 합니다.'
         }
         return ''
     }
