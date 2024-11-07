@@ -16,6 +16,7 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {postComment, getList} from "../../api/commentApi.js";
 import {getBoard} from "../../api/boardApi.js";
 import {useParams} from "react-router-dom";
+import {toast} from "react-toastify";
 
 function CommentComponent() {
     const [values, setValues] = useState('');
@@ -26,7 +27,7 @@ function CommentComponent() {
     const commentMutation = useMutation({
         mutationFn: (comment) => postComment(comment),
         onSuccess: () => {
-            alert("작성 성공");
+            toast.info(`"${boardData.title}" 글에 댓글을 달았습니다.`)
             queryClient.invalidateQueries(['comments', boardId]);
             setValues("");
         },
