@@ -1,22 +1,25 @@
-import TextField from "@mui/material/TextField";
+import { TextField } from "@mui/material";
 
-function TextFieldComponent({auto = true,id,name,type,label,value,handleChange,disabled=false}) {
-  return (
-      <TextField
-          autoFocus={auto}
-          required
-          margin="dense"
-          id={id}
-          name={name}
-          label={label}
-          type={type}
-          fullWidth
-          variant="filled"
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-      />
-  );
+function TextFieldComponent({auto=true, id, name, type, label, value, disabled=false, handleChange, onBlur, error = false, helperText = ""}) {
+    return (
+        <TextField
+            required
+            margin="dense"
+            id={id}
+            name={name}
+            type={type}
+            disabled={disabled}
+            label={label}
+            value={value}
+            onChange={handleChange}
+            onBlur={onBlur}
+            error={error}
+            helperText={helperText}
+            variant="outlined"
+            size="medium"
+            fullWidth
+        />
+    );
 }
 
 export default TextFieldComponent;
