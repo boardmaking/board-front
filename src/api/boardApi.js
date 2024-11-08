@@ -1,5 +1,6 @@
 import axios from "axios";
 import {BOARD} from "./config.js";
+import jwtAxios from "../util/jwtUtil.jsx";
 
 export const getList = async (param) => {
   return (await axios.get(`${BOARD}/list`, {
@@ -12,7 +13,7 @@ export const getList = async (param) => {
 
 export const postBoard = async (params) => {
   console.log(params)
-  return (await axios.post(`${BOARD}`, params)).data
+  return (await jwtAxios.post(`${BOARD}`, params)).data
 }
 
 export const getBoard = async (boardId) => {
