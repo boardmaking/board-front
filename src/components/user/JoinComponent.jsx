@@ -5,8 +5,7 @@ import { useState } from "react";
 import { postJoin } from "../../api/userApi.js";
 import { useMutation } from "@tanstack/react-query";
 import ModalComponent from "../common/ModalComponent.jsx";
-import {toast} from "react-toastify";
-
+import { toast } from "react-toastify";
 
 const initState = {
     email: '',
@@ -26,7 +25,6 @@ function JoinComponent() {
     const [user, setUser] = useState(initState)
     const [errors, setErrors] = useState(initErrors)
     const [fail, setFail] = useState(false)
-    const [result, setResult] = useState(null)
 
     const joinMutation = useMutation({mutationFn: () => postJoin(user),
         onSuccess: () => {
@@ -38,18 +36,13 @@ function JoinComponent() {
             );
             moveToPath('/');
         },
-    onError:() => {
-        setFail(true);
-    }})
+        onError: () => {
+            setFail(true);
+        }
+    })
 
     const handleJoin = () => {
         joinMutation.mutate()
-        if (joinMutation.isSuccess) {
-            moveToPath('/')
-        }
-        if (joinMutation.isError) {
-            setFail(true)
-        }
     }
 
     const validateEmail = (email) => {
@@ -116,22 +109,7 @@ function JoinComponent() {
     }
 
     const handleClose = () => {
-        if (result) {
-            setResult(null)
-            moveToPath('/')
-        }
-        if (fail) {
-            setFail(false)
-        }
-    }
-
-    const handleJoinClose = () => {
-        if (joinMutation.isSuccess) {
-            moveToPath('/')
-        }
-        if (fail) {
-            setFail(false)
-        }
+        setFail(false)
     }
 
     return (
@@ -144,15 +122,6 @@ function JoinComponent() {
                     alignItems: 'center'
                 }}
             >
-                {joinMutation.isSuccess && (
-                    <ModalComponent
-                        open={joinMutation.isSuccess}
-                        title="안녕하세요"
-                        content="회원가입 해주셔서 감사합니다."
-                        handleClose={handleJoinClose}
-                    />
-                )}
-
                 {fail && (
                     <ModalComponent
                         open={fail}
@@ -213,6 +182,7 @@ function JoinComponent() {
                         variant="contained"
                         onClick={handleJoin}
                         sx={{ mt: 2 }}
+                        disabled={joinMutation.isPending}
                     >
                         회원가입
                     </Button>
