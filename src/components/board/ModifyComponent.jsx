@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { Button, TextField } from "@mui/material";
@@ -7,7 +7,7 @@ import { postModify, getBoard } from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 import { toast } from "react-toastify";
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { getCookie } from "../../util/cookieUtil.jsx";
 
 const formats = [
@@ -18,41 +18,39 @@ const formats = [
 
 const ModifyComponent = () => {
     const { id: boardId } = useParams();
-    const location = useLocation();
     const { moveToMain } = useCustomMove();
     const quillRef = useRef(null);
     const titleRef = useRef(null);
     const userInfo = getCookie('user');
 
-    const initialData = location.state || {};
-
     const [board, setBoard] = useState({
         boardId: boardId,
         email: userInfo?.email || '',
-        title: initialData.title || '',
+        title: '',
         userId: userInfo?.id || '',
     });
 
-    const [values, setValues] = useState(initialData.content || '');
+    const [values, setValues] = useState('');
 
     const { data: boardData } = useQuery({
         queryKey: ['board', boardId],
         queryFn: () => getBoard(boardId),
-        onSuccess: (fetchedData) => {
-            if (!board.title && !values) {
-                setBoard(prev => ({
-                    ...prev,
-                    title: fetchedData.title,
-                }));
-                setValues(fetchedData.content);
-            }
-        },
         onError: (error) => {
             console.error("게시글 조회 실패:", error);
             toast.error("게시글을 불러오는데 실패했습니다.");
             moveToMain();
         }
     });
+
+    useEffect(() => {
+        if (boardData && !board.title) {
+            setBoard(prev => ({
+                ...prev,
+                title: boardData.title,
+            }));
+            setValues(boardData.content);
+        }
+    }, [boardData]);
 
     const boardMutation = useMutation({
         mutationFn: (board) => postModify(board)
@@ -166,12 +164,11 @@ const ModifyComponent = () => {
                     theme="snow"
                     modules={modules}
                     formats={formats}
-                    onChange={setValues}
                     value={values}
+                    onChange={setValues}
                     style={{ height: '100%' }}
                 />
             </div>
-
             <Button
                 variant="outlined"
                 color="primary"
