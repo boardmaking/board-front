@@ -42,6 +42,7 @@ const BoardDetailComponent = () => {
         });
     };
 
+
     const handleClickUpdate = () => {
         if (!userInfo) {
             toast.error("로그인 후 수정할 수 있습니다.");
@@ -55,36 +56,50 @@ const BoardDetailComponent = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-            <Paper elevation={3} sx={{ padding: 3, marginBottom: 3 }}>
-                <h2>{title}</h2>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', color: 'text.secondary', marginBottom: 2 }}>
-                    <span>작성자: {username}</span>
-                    <span>작성일: {createAt}</span>
-                </Box>
-                <Divider sx={{ margin: '20px 0' }} />
-                <div
-                    style={{
-                        minHeight: '200px',
-                        '& img': { maxWidth: '100%', height: 'auto' },
-                        '& p': { margin: '1em 0' },
-                        '& ul, & ol': { marginLeft: '2em' },
-                        '& blockquote': {
-                            borderLeft: '4px solid #ddd',
-                            marginLeft: 0,
-                            paddingLeft: '1em'
-                        }
-                    }}
-                    dangerouslySetInnerHTML={{ __html: content }}
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, marginTop: 3 }}>
-                    <Button onClick={moveToMain} variant="outlined" color="primary">목록</Button>
-                    <Button onClick={handleClickUpdate} variant="outlined" color="primary">수정</Button>
-                    <Button onClick={handleClickDelete} variant="outlined" color="error">삭제</Button>
-                </Box>
-            </Paper>
-            <CommentComponent />
-        </Box>
+
+    <Box sx={{maxWidth: '800px', margin: '0 auto', padding: '20px'}}>
+        <Paper elevation={3} sx={{padding: 3, marginBottom: 3}}>
+            <h2>{title}</h2>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                color: 'text.secondary',
+                marginBottom: 2
+            }}>
+                <span>작성자: {username}</span>
+                <span>작성일: {createAt}</span>
+            </Box>
+            <Divider sx={{margin: '20px 0'}}/>
+            <div
+                style={{
+                    minHeight: '200px',
+                    '& img': {maxWidth: '100%', height: 'auto'},
+                    '& p': {margin: '1em 0'},
+                    '& ul, & ol': {marginLeft: '2em'},
+                    '& blockquote': {
+                        borderLeft: '4px solid #ddd',
+                        marginLeft: 0,
+                        paddingLeft: '1em'
+                    }
+                }}
+                dangerouslySetInnerHTML={{__html: content}}
+            />
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: 1,
+                marginTop: 3
+            }}>
+                <Button onClick={moveToMain} variant="outlined"
+                        color="primary">목록</Button>
+                <Button onClick={handleClickUpdate} variant="outlined"
+                        color="primary">수정</Button>
+                <Button onClick={handleClickDelete} variant="outlined"
+                        color="error">삭제</Button>
+            </Box>
+        </Paper>
+        {/*<CommentComponent/>*/}
+    </Box>
     );
 };
 
