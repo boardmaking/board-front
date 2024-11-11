@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Paper } from "@mui/material";
 import { useLocation, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getBoard, postDeleteBoard } from "../../api/boardApi.js";
+import {getBoard, postDeleteBoard, postDownload} from "../../api/boardApi.js";
 import { getCookie } from "../../util/cookieUtil.jsx";
 import CommentComponent from "../comment/CommentComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
@@ -26,7 +26,7 @@ const BoardDetailComponent = () => {
         }
     });
 
-    const { data } = useQuery({
+    const { data, isSuccess } = useQuery({
         queryKey: ['board', boardId],
         queryFn: () => getBoard(boardId),
     });
@@ -54,6 +54,29 @@ const BoardDetailComponent = () => {
             toast.error("본인만 수정할 수 있습니다.");
         }
     };
+
+    const handleClickDownload = (e) => {
+        if (isSuccess){
+            const params = {boardId:data.boardId, fileName:e.target.name}
+        postDownload(params).then(data => {
+            console.log(data)
+           const url = window.URL.createObjectURL(new Blob([data]))
+            console.log(url)
+            const link = document.createElement('a')
+            link.href = url
+            link.setAttribute('download',name)
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+        }).catch(err => {
+            console.log("파일 다운로드 에러",err)
+        })
+        }
+    }
+
+    if (isSuccess){
+        console.log(data)
+    }
 
     return (
 
@@ -84,14 +107,36 @@ const BoardDetailComponent = () => {
                 }}
                 dangerouslySetInnerHTML={{__html: content}}
             />
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-                gap: 1,
-                marginTop: 3
-            }}>
-                <Button onClick={moveToMain} variant="outlined"
-                        color="primary">목록</Button>
+
+                    <h3>Attached Files:</h3>
+                    <ul>
+                        {isSuccess && data.uploadFileNameList? data.uploadFileNameList.map((uploadFileName, index) => (
+                            <li key={index}>
+                                <Button
+                                    name={uploadFileName}
+                                onClick={handleClickDownload}
+                                >
+                                     {/*href={`/path/to/files/${fileName}`}*/}
+                                    {uploadFileName.substring(37)}
+                                </Button>
+                            </li>
+                        ))
+                        :<></>
+                        }
+                    </ul>
+                :<></>
+                <></>
+                <Button
+                onClick={handleClickDownload}
+        >첨부파일 다운로드</Button>
+        <Box sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: 1,
+            marginTop: 3
+        }}>
+            <Button onClick={moveToMain} variant="outlined"
+                    color="primary">목록</Button>
                 <Button onClick={handleClickUpdate} variant="outlined"
                         color="primary">수정</Button>
                 <Button onClick={handleClickDelete} variant="outlined"

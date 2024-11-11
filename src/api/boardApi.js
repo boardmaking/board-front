@@ -30,3 +30,7 @@ export const postModify = async (params) => {
   console.log("게시판 업데이트")
   return (await axios.post(`${BOARD}/modify`, params)).data
 }
+
+export const postDownload = async (params) => {
+  return (await jwtAxios.post(`${BOARD}/download`,params,{responseType:'blob'})).data
+}
