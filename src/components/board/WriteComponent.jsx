@@ -7,6 +7,7 @@ import { postBoard } from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 import {toast} from "react-toastify";
+import FileUploadComponent from "../common/FileUploadComponent.jsx";
 
 const formats = [
     'font',
@@ -80,7 +81,8 @@ const WriteComponent = () => {
                     const range = quill.getSelection();
                     const index = range ? range.index : quill.getLength();
 
-                    quill.insertEmbed(index, 'image', reader.result);
+                    let deltaStatic = quill.insertEmbed(index, 'image', reader.result);
+                    console.log(deltaStatic.ops[0].insert.image)
                     quill.setSelection(index + 1);
                 };
                 reader.readAsDataURL(file);
@@ -133,6 +135,7 @@ const WriteComponent = () => {
         });
     }
 
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
             <TextFieldComponent
@@ -169,7 +172,7 @@ const WriteComponent = () => {
                     style={{ height: '100%' }}
                 />
             </div>
-
+            <FileUploadComponent/>
             <Button
                 variant="outlined"
                 color="primary"
