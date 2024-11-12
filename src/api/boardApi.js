@@ -1,5 +1,5 @@
 import axios from "axios";
-import {BOARD} from "./config.js";
+import {BOARD, IMAGE} from "./config.js";
 import jwtAxios from "../util/jwtUtil.jsx";
 
 export const getList = async (param) => {
@@ -31,6 +31,12 @@ export const postModify = async (params) => {
   return (await axios.post(`${BOARD}/modify`, params)).data
 }
 
+export const uploadImage = async (params) => {
+  console.log("이미지 업로드")
+  return (await axios.post(`${IMAGE}/upload`, params)).data
+}
+
 export const postDownload = async (params) => {
   return (await jwtAxios.post(`${BOARD}/download`,params,{responseType:'blob'})).data
+
 }

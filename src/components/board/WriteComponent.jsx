@@ -1,9 +1,10 @@
 import {useMemo, useRef, useState, useEffect} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+
 import {Button, TextField} from "@mui/material";
 import {useMutation} from "@tanstack/react-query";
-import {postBoard} from "../../api/boardApi.js";
+import {postBoard, uploadImage} from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 import {toast} from "react-toastify";
@@ -30,18 +31,71 @@ const formats = [
 ];
 
 const WriteComponent = () => {
+
   const {moveToMain} = useCustomMove();
   const [values, setValues] = useState('');
   const quillRef = useRef(null);
   const titleRef = useRef(null);
+  const [imageMap, setImageMap] = useState(new Map());
   const [board, setBoard] = useState({
-    email: '',
-    title: '',
-    content: '',
-    username: '',
-    files: []
-  });
+        email: '',
+        title: '',
+        content: '',
+        username: '',
+        files: [],
+        savePath: '',
+        originalName: '',
+        saveName: '',
+    });
+
   const boardMutation = useMutation({mutationFn: (board) => postBoard(board)});
+
+  const imageMutation = useMutation({
+        mutationFn: uploadImage,
+        onSuccess: (data, variables) => {
+            const requestBlob = variables.get('request');
+            const reader = new FileReader();
+            reader.onload = () => {
+                const request = JSON.parse(reader.result);
+                const imageInfo = {
+                    originalName: request.original_name,
+                    saveName: request.save_name,
+                    savePath: data.save_path
+                };
+
+                const quill = quillRef.current.getEditor();
+                const contents = quill.getContents();
+                contents.ops.forEach((op) => {
+                    if (op.insert && op.insert.image && op.insert.image.startsWith('data:')) {
+                        setImageMap(prev => new Map(prev.set(op.insert.image, imageInfo)));
+                    }
+                });
+            };
+            reader.readAsText(requestBlob);
+        },
+        onError: (error) => {
+            toast.error("이미지 업로드 실패");
+            console.error('Image upload error:', error);
+        }
+    });
+
+    const validateFile = (file) => {
+        const fileSize = file.size;
+        const maxSize = 20 * 1024 * 1024;
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (fileSize > maxSize) {
+            toast.error("업로드 가능한 최대 이미지 용량은 20MB 입니다.");
+            return false;
+        }
+
+        if (!['gif', 'jpg', 'jpeg', 'png', 'bmp'].includes(ext)) {
+            toast.error("jpg, jpeg, png, bmp, gif 파일만 업로드 가능합니다.");
+            return false;
+        }
+
+        return true;
+    };
 
   useEffect(() => {
     const cookieValue = document.cookie
@@ -69,28 +123,54 @@ const WriteComponent = () => {
   };
 
   const imageHandler = () => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/*');
-    input.click();
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
 
-    input.onchange = () => {
-      const file = input.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const quill = quillRef.current.getEditor();
-          const range = quill.getSelection();
-          const index = range ? range.index : quill.getLength();
+        input.onchange = async () => {
+            const file = input.files[0];
+            if (!file) return;
 
-          let deltaStatic = quill.insertEmbed(index, 'image', reader.result);
-          console.log(deltaStatic.ops[0].insert.image)
-          quill.setSelection(index + 1);
+            if (!validateFile(file)) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                const quill = quillRef.current.getEditor();
+                const range = quill.getSelection();
+                const position = range ? range.index : 0;
+
+                quill.insertEmbed(position, 'image', reader.result);
+                quill.setSelection(position + 1);
+
+                const formData = new FormData();
+                const saveName = `${Date.now()}_${file.name}`;
+
+                formData.append('file', file);
+                formData.append('request', new Blob([JSON.stringify({
+                    save_name: saveName,
+                    original_name: file.name
+                })], { type: 'application/json' }));
+
+                imageMutation.mutate(formData);
+            };
+            reader.readAsDataURL(file);
         };
-        reader.readAsDataURL(file);
-      }
+
+        input.click();
+  }
+    const replaceBase64WithImageInfo = (content) => {
+        let newContent = content;
+
+        for (const [base64Url, imageInfo] of imageMap.entries()) {
+            const imageData = {
+                path: imageInfo.savePath
+            };
+
+            newContent = newContent.replace(base64Url, JSON.stringify(imageData));
+        }
+
+        return newContent;
     };
-  };
 
   const modules = useMemo(() => {
     return {
@@ -135,6 +215,13 @@ const WriteComponent = () => {
     formData.append("email", board.email)
     formData.append("title", board.title)
     formData.append("content", values)
+    
+    if (imageMap.size) {
+        const imageInfo = [...imageMap.values()][0]; 
+        formData.append("save_path", imageInfo.savePath);
+        formData.append("original_name", imageInfo.originalName);
+        formData.append("save_name", imageInfo.saveName);
+    }
 
     boardMutation.mutate(formData, {
       onSuccess: () => {
@@ -147,6 +234,7 @@ const WriteComponent = () => {
     });
   }
 
+  
   const handleChangeUploadFile = (e) => {
     board[e.target.name] = e.target.files
     setBoard({...board})
@@ -187,6 +275,7 @@ const WriteComponent = () => {
               value={values}
               style={{height: '100%'}}
           />
+
         </div>
         <FileUploadComponent
             handleChangeUploadFile={handleChangeUploadFile}
