@@ -57,14 +57,14 @@ const BoardDetailComponent = () => {
 
     const handleClickDownload = (e) => {
         if (isSuccess){
-            const params = {boardId:data.boardId, fileName:e.target.name}
+            const fileName = e.target.name
+            const params = {boardId:data.boardId, fileName: fileName}
         postDownload(params).then(data => {
-            console.log(data)
            const url = window.URL.createObjectURL(new Blob([data]))
-            console.log(url)
             const link = document.createElement('a')
             link.href = url
-            link.setAttribute('download',name)
+
+            link.setAttribute('download',fileName)
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
