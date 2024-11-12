@@ -53,8 +53,6 @@ export default function TableComponent() {
         }
     }, [data]);
 
-    console.log(data)
-
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -128,7 +126,7 @@ export default function TableComponent() {
                                 hover
                                 role="checkbox"
                                 tabIndex={-1}
-                                key={row.id}
+                                key={row.boardId}
                                 onClick={() => handleClickRow(row.id, row.boardId, row.title, row.username, row.createAt, row.content)}
                                 sx={{
                                     cursor: 'pointer',
