@@ -21,6 +21,7 @@ const ModifyComponent = () => {
     const { moveToMain } = useCustomMove();
     const quillRef = useRef(null);
     const titleRef = useRef(null);
+    const [imageMap, setImageMap] = useState(new Map());
     const userInfo = getCookie('user');
 
     const [board, setBoard] = useState({
@@ -113,11 +114,25 @@ const ModifyComponent = () => {
             return;
         }
 
+        const replaceBase64WithImageInfo = (content) => {
+            let newContent = content;
+
+            for (const [base64Url, imageInfo] of imageMap.entries()) {
+                const imageData = {
+                    path: imageInfo.savePath
+                };
+
+                newContent = newContent.replace(base64Url, JSON.stringify(imageData));
+            }
+
+            return newContent;
+        };
+
         const modifiedBoard = {
             boardId: board.boardId,
             email: board.email,
             title: board.title,
-            content: values,
+            content: replaceBase64WithImageInfo(values),
             userId: board.userId
         };
 
