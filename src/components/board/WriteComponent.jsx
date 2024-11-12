@@ -183,8 +183,6 @@ const WriteComponent = () => {
         return newContent;
     };
 
-    const content = replaceBase64WithImageInfo(values);
-
   const modules = useMemo(() => {
     return {
       toolbar: {
