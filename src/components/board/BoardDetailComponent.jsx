@@ -1,11 +1,10 @@
-import { Box, Button, Divider, Paper } from "@mui/material";
-import { useLocation, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {Box, Button, Divider, Paper} from "@mui/material";
+import {useLocation, useParams} from "react-router-dom";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {getBoard, postDeleteBoard, postDownload} from "../../api/boardApi.js";
-import { getCookie } from "../../util/cookieUtil.jsx";
-import CommentComponent from "../comment/CommentComponent.jsx";
+import {getCookie} from "../../util/cookieUtil.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 
 const BoardDetailComponent = () => {
     const location = useLocation();
@@ -64,7 +63,7 @@ const BoardDetailComponent = () => {
             const link = document.createElement('a')
             link.href = url
 
-            link.setAttribute('download',fileName)
+            link.setAttribute('download',fileName.substring(37))
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
