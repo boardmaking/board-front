@@ -36,6 +36,7 @@ const WriteComponent = () => {
   const [values, setValues] = useState('');
   const quillRef = useRef(null);
   const titleRef = useRef(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
   const [imageMap, setImageMap] = useState(new Map());
   const [board, setBoard] = useState({
         email: '',
@@ -58,10 +59,12 @@ const WriteComponent = () => {
             reader.onload = () => {
                 const request = JSON.parse(reader.result);
                 const imageInfo = {
-                    originalName: request.original_name,
-                    saveName: request.save_name,
-                    savePath: data.save_path
+                    originalName: request.originalName,
+                    saveName: request.saveName,
+                    savePath: data.savePath
                 };
+
+                setUploadedImage(imageInfo);
 
                 const quill = quillRef.current.getEditor();
                 const contents = quill.getContents();
@@ -70,6 +73,12 @@ const WriteComponent = () => {
                         setImageMap(prev => new Map(prev.set(op.insert.image, imageInfo)));
                     }
                 });
+                setBoard(prevBoard => ({
+                    ...prevBoard,
+                    savePath: data.savePath,
+                    originalName: request.originalName,
+                    saveName: request.saveName
+                }));
             };
             reader.readAsText(requestBlob);
         },
@@ -147,8 +156,8 @@ const WriteComponent = () => {
 
                 formData.append('file', file);
                 formData.append('request', new Blob([JSON.stringify({
-                    save_name: saveName,
-                    original_name: file.name
+                    saveName: saveName,
+                    originalName: file.name
                 })], { type: 'application/json' }));
 
                 imageMutation.mutate(formData);
@@ -201,40 +210,34 @@ const WriteComponent = () => {
       return;
     }
 
-    const updatedBoard = {
-      ...board,
-      content: values
-    };
-
-    const formData = new FormData()
-    const files = board.files
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i])
-    }
-    formData.append("username", board.username)
-    formData.append("email", board.email)
-    formData.append("title", board.title)
-    formData.append("content", values)
-    
-    if (imageMap.size) {
-        const imageInfo = [...imageMap.values()][0]; 
-        formData.append("save_path", imageInfo.savePath);
-        formData.append("original_name", imageInfo.originalName);
-        formData.append("save_name", imageInfo.saveName);
-    }
-
-    boardMutation.mutate(formData, {
-      onSuccess: () => {
-        toast.success("글이 작성되었습니다.");
-        moveToMain();
-      },
-      onError: (error) => {
-        console.error('작성 실패:', error);
+      const formData = new FormData()
+      const files = board.files
+      for (let i = 0; i < files.length; i++) {
+          formData.append("files", files[i])
       }
-    });
+      formData.append("username", board.username);
+      formData.append("email", board.email);
+      formData.append("title", board.title);
+      formData.append("content", replaceBase64WithImageInfo(values));
+
+      if (uploadedImage) {
+          formData.append("savePath", uploadedImage.savePath);
+          formData.append("originalName", uploadedImage.originalName);
+          formData.append("saveName", uploadedImage.saveName);
+      }
+
+      boardMutation.mutate(formData, {
+          onSuccess: () => {
+              toast.success("글이 작성되었습니다.");
+              moveToMain();
+          },
+          onError: (error) => {
+              console.error('작성 실패:', error);
+          }
+      });
   }
 
-  
+
   const handleChangeUploadFile = (e) => {
     board[e.target.name] = e.target.files
     setBoard({...board})
