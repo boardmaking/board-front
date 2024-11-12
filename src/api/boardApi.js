@@ -35,3 +35,8 @@ export const uploadImage = async (params) => {
   console.log("이미지 업로드")
   return (await axios.post(`${IMAGE}/upload`, params)).data
 }
+
+export const postDownload = async (params) => {
+  return (await jwtAxios.post(`${BOARD}/download`,params,{responseType:'blob'})).data
+
+}

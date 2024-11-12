@@ -1,40 +1,43 @@
-import { useMemo, useRef, useState, useEffect } from 'react';
+import {useMemo, useRef, useState, useEffect} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { Button, TextField } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
-import { postBoard, uploadImage } from "../../api/boardApi.js";
+
+import {Button, TextField} from "@mui/material";
+import {useMutation} from "@tanstack/react-query";
+import {postBoard, uploadImage} from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
+import FileUploadComponent from "../common/FileUploadComponent.jsx";
 
 const formats = [
-    'font',
-    'header',
-    'bold',
-    'italic',
-    'underline',
-    'strike',
-    'blockquote',
-    'list',
-    'bullet',
-    'indent',
-    'link',
-    'align',
-    'color',
-    'background',
-    'size',
-    'h1',
-    'image',
+  'font',
+  'header',
+  'bold',
+  'italic',
+  'underline',
+  'strike',
+  'blockquote',
+  'list',
+  'bullet',
+  'indent',
+  'link',
+  'align',
+  'color',
+  'background',
+  'size',
+  'h1',
+  'image',
 ];
 
 const WriteComponent = () => {
-    const { moveToMain } = useCustomMove();
-    const [values, setValues] = useState('');
-    const quillRef = useRef(null);
-    const titleRef = useRef(null);
-    const [imageMap, setImageMap] = useState(new Map());
-    const [board, setBoard] = useState({
+
+  const {moveToMain} = useCustomMove();
+  const [values, setValues] = useState('');
+  const quillRef = useRef(null);
+  const titleRef = useRef(null);
+  const [imageMap, setImageMap] = useState(new Map());
+  const [board, setBoard] = useState({
         email: '',
         title: '',
         content: '',
@@ -45,29 +48,9 @@ const WriteComponent = () => {
         saveName: '',
     });
 
-    useEffect(() => {
-        const cookieValue = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('user='));
+  const boardMutation = useMutation({mutationFn: (board) => postBoard(board)});
 
-        if (cookieValue) {
-            const userInfo = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
-            setBoard(prevBoard => ({
-                ...prevBoard,
-                email: userInfo.email,
-                username: userInfo.username,
-                boardId: userInfo.boardId
-            }));
-        }
-
-        titleRef.current?.focus();
-    }, []);
-
-    const boardMutation = useMutation({
-        mutationFn: (board) => postBoard(board)
-    });
-
-    const imageMutation = useMutation({
+  const imageMutation = useMutation({
         mutationFn: uploadImage,
         onSuccess: (data, variables) => {
             const requestBlob = variables.get('request');
@@ -114,7 +97,32 @@ const WriteComponent = () => {
         return true;
     };
 
-    const imageHandler = () => {
+  useEffect(() => {
+    const cookieValue = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('user='));
+
+    if (cookieValue) {
+      const userInfo = JSON.parse(
+          decodeURIComponent(cookieValue.split('=')[1]));
+      setBoard(prevBoard => ({
+        ...prevBoard,
+        email: userInfo.email,
+        username: userInfo.username
+      }));
+    }
+
+    titleRef.current?.focus();
+  }, []);
+
+  const handleTitleChange = (event) => {
+    setBoard({
+      ...board,
+      title: event.target.value
+    });
+  };
+
+  const imageHandler = () => {
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
         input.setAttribute('accept', 'image/*');
@@ -149,8 +157,7 @@ const WriteComponent = () => {
         };
 
         input.click();
-    };
-
+  }
     const replaceBase64WithImageInfo = (content) => {
         let newContent = content;
 
@@ -165,106 +172,124 @@ const WriteComponent = () => {
         return newContent;
     };
 
-    const handleTitleChange = (event) => {
-        setBoard({
-            ...board,
-            title: event.target.value
-        });
+  const modules = useMemo(() => {
+    return {
+      toolbar: {
+        container: [
+          [{size: ['small', false, 'large', 'huge']}],
+          [{align: []}],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{list: 'ordered'}, {list: 'bullet'}],
+          [{color: []}, {background: []}],
+          ['image'],
+        ],
+        handlers: {
+          image: imageHandler,
+        },
+      },
+    };
+  }, []);
+
+  const handleClickWrite = () => {
+    if (!board.title.trim()) {
+      alert('제목을 입력해주세요.');
+      return;
+    }
+
+    if (!values.trim()) {
+      alert('내용을 입력해주세요.');
+      return;
+    }
+
+    const updatedBoard = {
+      ...board,
+      content: values
     };
 
-    const modules = useMemo(() => ({
-        toolbar: {
-            container: [
-                [{ size: ['small', false, 'large', 'huge'] }],
-                [{ align: [] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ list: 'ordered' }, { list: 'bullet' }],
-                [{ color: [] }, { background: [] }],
-                ['image']
-            ],
-            handlers: {
-                image: imageHandler
-            }
-        }
-    }), []);
+    const formData = new FormData()
+    const files = board.files
+    for (let i = 0; i < files.length; i++) {
+      formData.append("files", files[i])
+    }
+    formData.append("username", board.username)
+    formData.append("email", board.email)
+    formData.append("title", board.title)
+    formData.append("content", values)
+    
+    if (imageMap.size) {
+        const imageInfo = [...imageMap.values()][0]; 
+        formData.append("save_path", imageInfo.savePath);
+        formData.append("original_name", imageInfo.originalName);
+        formData.append("save_name", imageInfo.saveName);
+    }
 
+    boardMutation.mutate(formData, {
+      onSuccess: () => {
+        toast.success("글이 작성되었습니다.");
+        moveToMain();
+      },
+      onError: (error) => {
+        console.error('작성 실패:', error);
+      }
+    });
+  }
 
-    const handleClickWrite = async () => {
-        if (!board.title.trim()) {
-            alert('제목을 입력해주세요.');
-            return;
-        }
+  
+  const handleChangeUploadFile = (e) => {
+    board[e.target.name] = e.target.files
+    setBoard({...board})
+  }
 
-        if (!values.trim()) {
-            alert('내용을 입력해주세요.');
-            return;
-        }
+  return (
+      <div style={{display: 'flex', flexDirection: 'column', padding: '20px'}}>
+        <TextFieldComponent
+            label="작성자"
+            value={board.username}
+            InputProps={{
+              readOnly: true,
+            }}
+            variant="outlined"
+            fullWidth
+        />
 
-        const processedContent = replaceBase64WithImageInfo(values);
+        <TextField
+            ref={titleRef}
+            style={{marginTop: 10}}
+            label="제목"
+            value={board.title}
+            onChange={handleTitleChange}
+            variant="outlined"
+            fullWidth
+            required
+            placeholder="제목을 입력해주세요"
+            autoFocus
+        />
 
-        boardMutation.mutate({
-            email: board.email,
-            title: board.title,
-            content: processedContent,
-            save_path: imageMap.size ? [...imageMap.values()][0].savePath : '',
-            original_name: imageMap.size ? [...imageMap.values()][0].originalName : '',
-            save_name: imageMap.size ? [...imageMap.values()][0].saveName : ''
-        }, {
-            onSuccess: () => {
-                toast.success("글이 작성되었습니다.");
-                moveToMain();
-            },
-            onError: (error) => {
-                console.error('작성 실패:', error);
-            }
-        });
-    };
+        <div style={{height: '500px', border: '1px solid #ccc'}}>
+          <ReactQuill
+              ref={quillRef}
+              theme="snow"
+              modules={modules}
+              formats={formats}
+              onChange={setValues}
+              value={values}
+              style={{height: '100%'}}
+          />
 
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
-            <TextFieldComponent
-                label="작성자"
-                value={board.username}
-                InputProps={{ readOnly: true }}
-                variant="outlined"
-                fullWidth
-            />
-
-            <TextField
-                ref={titleRef}
-                style={{ marginTop: 10 }}
-                label="제목"
-                value={board.title}
-                onChange={handleTitleChange}
-                variant="outlined"
-                fullWidth
-                required
-                placeholder="제목을 입력해주세요"
-                autoFocus
-            />
-
-            <div style={{ height: '500px', marginTop: '10px', border: '1px solid #ccc' }}>
-                <ReactQuill
-                    ref={quillRef}
-                    theme="snow"
-                    modules={modules}
-                    formats={formats}
-                    onChange={setValues}
-                    value={values}
-                    style={{ height: '100%' }}
-                />
-            </div>
-
-            <Button
-                variant="outlined"
-                color="primary"
-                style={{ position: "relative", zIndex: '2', marginTop: '20px' }}
-                onClick={handleClickWrite}
-            >
-                글작성
-            </Button>
         </div>
-    );
+        <FileUploadComponent
+            handleChangeUploadFile={handleChangeUploadFile}
+        />
+        <Button
+            variant="outlined"
+            color="primary"
+            style={{position: "relative", zIndex: '2'}}
+            onClick={handleClickWrite}
+        >
+          글작성
+        </Button>
+      </div>
+  );
 };
 
 export default WriteComponent;
