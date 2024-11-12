@@ -58,9 +58,9 @@ const WriteComponent = () => {
             reader.onload = () => {
                 const request = JSON.parse(reader.result);
                 const imageInfo = {
-                    originalName: request.original_name,
-                    saveName: request.save_name,
-                    savePath: data.save_path
+                    originalName: request.originalName,
+                    saveName: request.saveName,
+                    savePath: request.savePath
                 };
 
                 const quill = quillRef.current.getEditor();
@@ -147,8 +147,8 @@ const WriteComponent = () => {
 
                 formData.append('file', file);
                 formData.append('request', new Blob([JSON.stringify({
-                    save_name: saveName,
-                    original_name: file.name
+                    saveName: saveName,
+                    originalName: file.name
                 })], { type: 'application/json' }));
 
                 imageMutation.mutate(formData);
@@ -171,6 +171,8 @@ const WriteComponent = () => {
 
         return newContent;
     };
+
+    const content = replaceBase64WithImageInfo(values);
 
   const modules = useMemo(() => {
     return {
@@ -201,11 +203,6 @@ const WriteComponent = () => {
       return;
     }
 
-    const updatedBoard = {
-      ...board,
-      content: values
-    };
-
     const formData = new FormData()
     const files = board.files
     for (let i = 0; i < files.length; i++) {
@@ -214,13 +211,15 @@ const WriteComponent = () => {
     formData.append("username", board.username)
     formData.append("email", board.email)
     formData.append("title", board.title)
-    formData.append("content", values)
-    
+    formData.append("content", content)
+
     if (imageMap.size) {
-        const imageInfo = [...imageMap.values()][0]; 
+        const imageInfo = [...imageMap.values()][0];
         formData.append("save_path", imageInfo.savePath);
-        formData.append("original_name", imageInfo.originalName);
-        formData.append("save_name", imageInfo.saveName);
+        formData.append("originalName", imageInfo.originalName);
+        formData.append("saveName", imageInfo.saveName);
+        console.log("save_path"+imageInfo.savePath)
+
     }
 
     boardMutation.mutate(formData, {
@@ -234,7 +233,7 @@ const WriteComponent = () => {
     });
   }
 
-  
+
   const handleChangeUploadFile = (e) => {
     board[e.target.name] = e.target.files
     setBoard({...board})
