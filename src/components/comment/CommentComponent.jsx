@@ -46,6 +46,7 @@ function CommentComponent() {
         queryFn: () => getList(boardId.toString()),
     });
 
+
     useEffect(() => {
         const cookieValue = document.cookie
             .split('; ')
