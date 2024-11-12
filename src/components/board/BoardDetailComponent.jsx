@@ -19,6 +19,7 @@ import {styled} from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import FolderIcon from "@mui/icons-material/Folder";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import CommentComponent from "../comment/CommentComponent.jsx";
 
 const BoardDetailComponent = () => {
   const location = useLocation();
@@ -170,7 +171,7 @@ const BoardDetailComponent = () => {
                     color="error">삭제</Button>
           </Box>
         </Paper>
-        {/*<CommentComponent/>*/}
+        <CommentComponent/>
       </Box>
   );
 };
