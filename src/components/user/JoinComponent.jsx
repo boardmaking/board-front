@@ -108,6 +108,7 @@ function JoinComponent() {
         }))
     }
 
+
     const handleClose = () => {
         setFail(false)
     }

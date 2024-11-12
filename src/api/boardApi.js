@@ -23,7 +23,7 @@ export const getBoard = async (boardId) => {
 
 export const postDeleteBoard = async (params) => {
   console.log(params)
-  return (await axios.post(`${BOARD}/delete`, params)).data
+  return (await jwtAxios.post(`${BOARD}/delete`, params)).data
 }
 
 export const postModify = async (params) => {
