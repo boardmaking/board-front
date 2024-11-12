@@ -61,7 +61,9 @@ const WriteComponent = () => {
                 const imageInfo = {
                     originalName: request.originalName,
                     saveName: request.saveName,
+
                     savePath: data.savePath
+
                 };
 
                 setUploadedImage(imageInfo);
@@ -181,6 +183,8 @@ const WriteComponent = () => {
         return newContent;
     };
 
+    const content = replaceBase64WithImageInfo(values);
+
   const modules = useMemo(() => {
     return {
       toolbar: {
@@ -214,6 +218,7 @@ const WriteComponent = () => {
       const files = board.files
       for (let i = 0; i < files.length; i++) {
           formData.append("files", files[i])
+
       }
       formData.append("username", board.username);
       formData.append("email", board.email);

@@ -20,6 +20,8 @@ import IconButton from "@mui/material/IconButton";
 import FolderIcon from "@mui/icons-material/Folder";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CommentComponent from "../comment/CommentComponent.jsx";
+import ModalComponent from "../common/ModalComponent.jsx";
+import {useState} from "react";
 
 const BoardDetailComponent = () => {
   const location = useLocation();
@@ -31,7 +33,7 @@ const BoardDetailComponent = () => {
     createAt = "정보 없음"
   } = location.state || {};
   const {id: boardId} = useParams();
-
+  const [open, setOpen] = useState(false)
   const userInfo = getCookie('user');
 
   const boardMutation = useMutation({
@@ -88,9 +90,15 @@ const BoardDetailComponent = () => {
         link.click()
         document.body.removeChild(link)
       }).catch(err => {
-        console.log("파일 다운로드 에러", err)
+        if(err.response.data.ERROR === "REQUIRED_LOGIN"){
+          setOpen(true)
+        }
       })
     }
+  }
+
+  const handleClickClose = () => {
+    setOpen(false)
   }
 
   const Demo = styled('div')(({theme}) => ({
@@ -172,6 +180,12 @@ const BoardDetailComponent = () => {
           </Box>
         </Paper>
         <CommentComponent/>
+        <ModalComponent
+        title={"회원 전용 기능"}
+        content={"회원이 아니어서 파일을 다운로드할 수 없습니다. 로그인 해주세요:)"}
+        handleClose={handleClickClose}
+        open={open}
+        />
       </Box>
   );
 };
