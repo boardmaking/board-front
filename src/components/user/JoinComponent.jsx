@@ -6,6 +6,13 @@ import { postJoin } from "../../api/userApi.js";
 import { useMutation } from "@tanstack/react-query";
 import ModalComponent from "../common/ModalComponent.jsx";
 import { toast } from "react-toastify";
+const USER1 = import.meta.env.VITE_API_USER1
+const USER2 = import.meta.env.VITE_API_USER2
+const USER3 = import.meta.env.VITE_API_USER3
+const USER4 = import.meta.env.VITE_API_USER4
+const USER5 = import.meta.env.VITE_API_USER5
+const USER6 = import.meta.env.VITE_API_USER6
+const USER7 = import.meta.env.VITE_API_USER7
 
 const initState = {
     email: '',
@@ -24,6 +31,7 @@ function JoinComponent() {
     const [user, setUser] = useState(initState)
     const [errors, setErrors] = useState(initErrors)
     const [fail, setFail] = useState(false)
+
 
     const joinMutation = useMutation({mutationFn: () => postJoin(user),
         onSuccess: () => {
@@ -87,7 +95,6 @@ function JoinComponent() {
             ...prev,
             [name]: value
         }))
-        console.log(user)
     }
 
     const handleBlur = (e) => {
@@ -179,11 +186,13 @@ function JoinComponent() {
                         sx={{ mt: 2 }}
                     >
                         <MenuItem value="" disabled>유저를 선택하세요</MenuItem>
-                        <MenuItem value="유저1">유저 1</MenuItem>
-                        <MenuItem value="유저2">유저 2</MenuItem>
-                        <MenuItem value="유저3">유저 3</MenuItem>
-                        <MenuItem value="유저4">유저 4</MenuItem>
-                        <MenuItem value="유저5">유저 5</MenuItem>
+                        <MenuItem value={USER1}>{USER1}</MenuItem>
+                        <MenuItem value={USER2}>{USER2}</MenuItem>
+                        <MenuItem value={USER3}>{USER3}</MenuItem>
+                        <MenuItem value={USER4}>{USER4}</MenuItem>
+                        <MenuItem value={USER5}>{USER5}</MenuItem>
+                        <MenuItem value={USER6}>{USER6}</MenuItem>
+                        <MenuItem value={USER7}>{USER7}</MenuItem>
                     </Select>
 
                     <TextFieldComponent
