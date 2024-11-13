@@ -37,7 +37,6 @@ function LoginComponent() {
 
         doLogin(user)
             .then(data => {
-                console.log(data)
                 if (data.error) {
                     setFail(true)
                 } else {
