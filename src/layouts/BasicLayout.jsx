@@ -96,7 +96,6 @@ export default function BasicLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [search, setSearch] = useState(initState);
   const { moveToList, moveToMain, moveToPath } = useCustomMove();
-  const {loginState} = useCustomLogin()
   const {doLogout, isAdmin} = useCustomLogin();
   const [userInfo, setUserInfo] = useState(null);
   const location = useLocation();
@@ -125,7 +124,7 @@ export default function BasicLayout({ children }) {
     moveToMain();
   }
 
-  const handleClickSearch = (e) => {
+  const handleClickSearch = () => {
     moveToList(search);
   }
 
