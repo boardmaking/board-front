@@ -19,6 +19,8 @@ import FileUploadComponent from "../common/FileUploadComponent.jsx";
 import IconButton from "@mui/material/IconButton";
 import FolderIcon from "@mui/icons-material/Folder";
 import ClearIcon from '@mui/icons-material/Clear';
+import ModalComponent from "../common/ModalComponent.jsx";
+import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 
 const formats = [
   'font',
@@ -59,6 +61,8 @@ const WriteComponent = () => {
         saveName: '',
     });
   const [fileStore, setFileStore] = useState([])
+  const [open, setOpen] = useState(false)
+  const {isLogin, moveToLoginReturn} = useCustomLogin()
 
   const boardMutation = useMutation({mutationFn: (board) => postBoard(board)});
 
@@ -258,6 +262,9 @@ const WriteComponent = () => {
           },
           onError: (error) => {
               console.error('작성 실패:', error);
+              if (error.response.data.ERROR === 'REQUIRED_LOGIN'){
+                setOpen(true)
+              }
           }
       });
   }
@@ -276,6 +283,14 @@ const WriteComponent = () => {
         ...fileStore,
             ...Array.from(files)
       ])
+  }
+
+  const handleClickClose = () => {
+    setOpen(false)
+  }
+
+  if (!isLogin){
+    return moveToLoginReturn()
   }
 
   return (
@@ -351,6 +366,12 @@ const WriteComponent = () => {
         >
           글작성
         </Button>
+        <ModalComponent
+            title={"회원 전용 기능"}
+            content={"회원이 아니어서 글을 작성할 수 없습니다. 로그인 해주세요:)"}
+            handleClose={handleClickClose}
+            open={open}
+        />
       </div>
   );
 };
