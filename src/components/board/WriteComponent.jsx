@@ -239,7 +239,7 @@ const WriteComponent = () => {
 
     }
 
-      }
+
       formData.append("username", board.username);
       formData.append("email", board.email);
       formData.append("title", board.title);
