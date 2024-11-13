@@ -41,6 +41,10 @@ function JoinComponent() {
         }
     })
 
+    if (joinMutation.isError){
+        console.log(joinMutation.error)
+    }
+
     const handleJoin = () => {
         joinMutation.mutate()
     }

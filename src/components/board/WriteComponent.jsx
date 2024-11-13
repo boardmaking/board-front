@@ -1,14 +1,24 @@
-import {useMemo, useRef, useState, useEffect} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-import {Button, TextField} from "@mui/material";
+import {
+  Avatar,
+  Button,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  TextField
+} from "@mui/material";
 import {useMutation} from "@tanstack/react-query";
 import {postBoard, uploadImage} from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 import {toast} from "react-toastify";
 import FileUploadComponent from "../common/FileUploadComponent.jsx";
+import IconButton from "@mui/material/IconButton";
+import FolderIcon from "@mui/icons-material/Folder";
+import ClearIcon from '@mui/icons-material/Clear';
 
 const formats = [
   'font',
@@ -48,6 +58,7 @@ const WriteComponent = () => {
         originalName: '',
         saveName: '',
     });
+  const [fileStore, setFileStore] = useState([])
 
   const boardMutation = useMutation({mutationFn: (board) => postBoard(board)});
 
@@ -212,10 +223,21 @@ const WriteComponent = () => {
       return;
     }
 
-      const formData = new FormData()
-      const files = board.files
-      for (let i = 0; i < files.length; i++) {
-          formData.append("files", files[i])
+
+    const formData = new FormData()
+
+    for (let i = 0; i < fileStore.length; i++) {
+      formData.append("files", fileStore[i])
+    }
+
+    if (imageMap.size) {
+        const imageInfo = [...imageMap.values()][0];
+        formData.append("save_path", imageInfo.savePath);
+        formData.append("originalName", imageInfo.originalName);
+        formData.append("saveName", imageInfo.saveName);
+        console.log("save_path"+imageInfo.savePath)
+
+    }
 
       }
       formData.append("username", board.username);
@@ -240,10 +262,20 @@ const WriteComponent = () => {
       });
   }
 
+  const handleClickFileClear = (index) => {
+    const updatedFileStore = fileStore.filter((_,i) => i !== index)
+    console.log(updatedFileStore)
+    setFileStore(updatedFileStore)
+  }
 
   const handleChangeUploadFile = (e) => {
     board[e.target.name] = e.target.files
     setBoard({...board})
+    const files = board.files
+      setFileStore((fileStore) => [
+        ...fileStore,
+            ...Array.from(files)
+      ])
   }
 
   return (
@@ -286,6 +318,31 @@ const WriteComponent = () => {
         <FileUploadComponent
             handleChangeUploadFile={handleChangeUploadFile}
         />
+        {fileStore.length > 0? fileStore.map((uploadFile, index) => (
+            <ListItem key={index}
+                      secondaryAction={
+                        <IconButton
+                            name={uploadFile.name}
+                            onClick={() => handleClickFileClear(index)}
+                            edge="end"
+                            aria-label="upload">
+                          <ClearIcon
+                              name={uploadFile.name}
+                          />
+                        </IconButton>
+                      }
+            >
+              <ListItemAvatar>
+                <Avatar>
+                  <FolderIcon/>
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                  primary={uploadFile.name}
+              />
+            </ListItem>)
+        ):<></>
+        }
         <Button
             variant="outlined"
             color="primary"

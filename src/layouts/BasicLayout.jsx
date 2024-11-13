@@ -96,7 +96,8 @@ export default function BasicLayout({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [search, setSearch] = useState(initState);
   const { moveToList, moveToMain, moveToPath } = useCustomMove();
-  const {doLogout} = useCustomLogin();
+  const {loginState} = useCustomLogin()
+  const {doLogout, isAdmin} = useCustomLogin();
   const [userInfo, setUserInfo] = useState(null);
   const location = useLocation();
   const pathname = location.pathname;
@@ -150,6 +151,11 @@ export default function BasicLayout({ children }) {
                 <UserInfoTypography variant="subtitle1">
                   {userInfo.username}님 환영합니다
                 </UserInfoTypography>
+                {isAdmin() && pathname !== '/users/join' ?<StyledButton variant="outlined" onClick={handleClickJoin}>
+                  회원가입하러 가기
+                </StyledButton> :<></>
+
+                }
                 <StyledButton variant="outlined" onClick={handleClickLogout}>
                   로그아웃
                 </StyledButton>
@@ -161,13 +167,10 @@ export default function BasicLayout({ children }) {
                       로그인하러 가기
                     </StyledButton>
                 )}
-                {pathname !== '/users/join' && (
-                    <StyledButton variant="outlined" onClick={handleClickJoin}>
-                      회원가입하러 가기
-                    </StyledButton>
-                )}
               </>
           )}
+
+
         </Box>
         <StyledAppBar position="static" sx={{ borderRadius: '2px' }}>
           <Toolbar>
