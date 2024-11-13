@@ -19,7 +19,7 @@ export const postLogin = async (loginParam) => {
 }
 
 export const postJoin = async (user) => {
-  return (await axios.post(`${USER}/join`, user)).data
+  return (await jwtAxios.post(`${USER}/join`, user)).data
 }
 
 export const getUser = async (email) => {

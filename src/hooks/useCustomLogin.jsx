@@ -11,6 +11,17 @@ const useCustomLogin = () => {
 
   const isLogin = !!loginState.email
 
+  const isAdmin = () => {
+    if (isLogin) {
+      const roles = loginState.roles
+      for (let i = 0; i < roles.length; i++) {
+        if (roles[i] === 'ADMIN') {
+          return true
+        }
+      }
+    }
+    return false
+  }
 
   const doLogin = async (loginParam) => {
     const action = await dispatch(loginPostAsync(loginParam))
@@ -21,26 +32,36 @@ const useCustomLogin = () => {
     dispatch(logout())
   }
 
-  const moveToKakao = (path,email,name) => {
+  const moveToKakao = (path, email, name) => {
     navigate(
         {pathname: `/users/${path}`},
         {state: {email, name}},
-        {replace:true})
+        {replace: true})
   }
 
   const moveToPath = (path) => {
-    navigate({pathname: path},{replace:true})
+    navigate({pathname: path}, {replace: true})
   }
 
   const moveToLogin = () => {
-    navigate({pathname:'/users/login'}, {replace:true})
+    navigate({pathname: '/users/login'}, {replace: true})
   }
 
   const moveToLoginReturn = () => {
     return <Navigate replace to="/users/login"/>
   }
 
-  return {loginState,isLogin,doLogin,doLogout,moveToPath,moveToLogin,moveToLoginReturn, moveToKakao}
+  return {
+    loginState,
+    isLogin,
+    doLogin,
+    doLogout,
+    moveToPath,
+    moveToLogin,
+    moveToLoginReturn,
+    moveToKakao,
+    isAdmin
+  }
 }
 
 export default useCustomLogin
