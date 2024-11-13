@@ -1,4 +1,6 @@
-export const API_SERVER_HOST = 'http://192.168.0.22:8081'
+const SERVER_HOST = import.meta.env.VITE_API_SERVER_HOST
+
+export const API_SERVER_HOST = `${SERVER_HOST}:8081`
 
 export const USER = `${API_SERVER_HOST}/users`
 
