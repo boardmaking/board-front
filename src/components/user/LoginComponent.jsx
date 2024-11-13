@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import {Avatar, Box, Button, Container} from "@mui/material";
-import {useMutation} from "@tanstack/react-query";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import ModalComponent from "../common/ModalComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
@@ -38,7 +37,8 @@ function LoginComponent() {
 
         doLogin(user)
             .then(data => {
-                if (data.ERROR) {
+                console.log(data)
+                if (data.error) {
                     setFail(true)
                 } else {
                     setSuccess(true)
@@ -69,7 +69,7 @@ function LoginComponent() {
                 <></>}
             {fail ? <ModalComponent
                 open={fail}
-                title={`안녕하세요 로그인에 실패하셨습니다`}
+                title={`로그인 실패`}
                 content={'아이디와 비밀번호를 다시 확인해주세요'}
                 handleClose={handleClose}
             /> : <></>}
