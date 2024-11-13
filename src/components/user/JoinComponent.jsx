@@ -1,4 +1,4 @@
-import { Box, Button, Container } from "@mui/material";
+import {Box, Button, Container, MenuItem, Select} from "@mui/material";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 import { useState } from "react";
@@ -11,7 +11,6 @@ const initState = {
     email: '',
     password: '',
     username: '',
-    kakaoId: null
 }
 
 const initErrors = {
@@ -88,6 +87,7 @@ function JoinComponent() {
             ...prev,
             [name]: value
         }))
+        console.log(user)
     }
 
     const handleBlur = (e) => {
@@ -170,7 +170,24 @@ function JoinComponent() {
                         helperText={errors.password}
                     />
 
+                    <Select
+                        name={'username'}
+                        value={'username'}
+                        onChange={handleChange}
+                        displayEmpty
+                        fullWidth
+                        sx={{ mt: 2 }}
+                    >
+                        <MenuItem value="" disabled>유저를 선택하세요</MenuItem>
+                        <MenuItem value="유저1">유저 1</MenuItem>
+                        <MenuItem value="유저2">유저 2</MenuItem>
+                        <MenuItem value="유저3">유저 3</MenuItem>
+                        <MenuItem value="유저4">유저 4</MenuItem>
+                        <MenuItem value="유저5">유저 5</MenuItem>
+                    </Select>
+
                     <TextFieldComponent
+                        disabled={true}
                         id="username"
                         name="username"
                         type="text"
