@@ -1,20 +1,19 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
 import {
-  Avatar,
-  Button,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  TextField
+    Avatar,
+    Button,
+    ListItem,
+    ListItemAvatar,
+    ListItemText,
+    TextField
 } from "@mui/material";
-import {useMutation} from "@tanstack/react-query";
-import {postBoard, uploadImage} from "../../api/boardApi.js";
+import { useMutation } from "@tanstack/react-query";
+import { postBoard, uploadImage } from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import FileUploadComponent from "../common/FileUploadComponent.jsx";
 import IconButton from "@mui/material/IconButton";
 import FolderIcon from "@mui/icons-material/Folder";
@@ -43,14 +42,12 @@ const formats = [
 ];
 
 const WriteComponent = () => {
-
-  const {moveToMain} = useCustomMove();
-  const [values, setValues] = useState('');
-  const quillRef = useRef(null);
-  const titleRef = useRef(null);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [imageMap, setImageMap] = useState(new Map());
-  const [board, setBoard] = useState({
+    const { moveToMain } = useCustomMove();
+    const [values, setValues] = useState('');
+    const quillRef = useRef(null);
+    const titleRef = useRef(null);
+    const [tempImages, setTempImages] = useState(new Map());
+    const [board, setBoard] = useState({
         email: '',
         title: '',
         content: '',
@@ -66,56 +63,17 @@ const WriteComponent = () => {
 
   const boardMutation = useMutation({mutationFn: (board) => postBoard(board)});
 
-  const imageMutation = useMutation({
-        mutationFn: uploadImage,
-        onSuccess: (data, variables) => {
-            const requestBlob = variables.get('request');
-            const reader = new FileReader();
-            reader.onload = () => {
-                const request = JSON.parse(reader.result);
-                const imageInfo = {
-                    originalName: request.originalName,
-                    saveName: request.saveName,
-
-                    savePath: data.savePath
-
-                };
-
-                setUploadedImage(imageInfo);
-
-                const quill = quillRef.current.getEditor();
-                const contents = quill.getContents();
-                contents.ops.forEach((op) => {
-                    if (op.insert && op.insert.image && op.insert.image.startsWith('data:')) {
-                        setImageMap(prev => new Map(prev.set(op.insert.image, imageInfo)));
-                    }
-                });
-                setBoard(prevBoard => ({
-                    ...prevBoard,
-                    savePath: data.savePath,
-                    originalName: request.originalName,
-                    saveName: request.saveName
-                }));
-            };
-            reader.readAsText(requestBlob);
-        },
-        onError: (error) => {
-            toast.error("이미지 업로드 실패");
-            console.error('Image upload error:', error);
-        }
-    });
-
     const validateFile = (file) => {
-        const fileSize = file.size;
-        const maxSize = 20 * 1024 * 1024;
+        const maxSize = 20 * 1024 * 1024; // 20MB
         const ext = file.name.split('.').pop().toLowerCase();
+        const validExtensions = ['gif', 'jpg', 'jpeg', 'png', 'bmp'];
 
-        if (fileSize > maxSize) {
+        if (file.size > maxSize) {
             toast.error("업로드 가능한 최대 이미지 용량은 20MB 입니다.");
             return false;
         }
 
-        if (!['gif', 'jpg', 'jpeg', 'png', 'bmp'].includes(ext)) {
+        if (!validExtensions.includes(ext)) {
             toast.error("jpg, jpeg, png, bmp, gif 파일만 업로드 가능합니다.");
             return false;
         }
@@ -123,151 +81,156 @@ const WriteComponent = () => {
         return true;
     };
 
-  useEffect(() => {
-    const cookieValue = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('user='));
+    const handleEditorChange = (content) => {
+        setValues(content);
 
-    if (cookieValue) {
-      const userInfo = JSON.parse(
-          decodeURIComponent(cookieValue.split('=')[1]));
-      setBoard(prevBoard => ({
-        ...prevBoard,
-        email: userInfo.email,
-        username: userInfo.username
-      }));
-    }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(content, 'text/html');
+        const currentImages = new Set(
+            Array.from(doc.images).map(img => img.src)
+        );
 
-    titleRef.current?.focus();
-  }, []);
+        setTempImages(prev => {
+            const newMap = new Map(prev);
+            for (const [id, imageData] of newMap) {
+                if (!currentImages.has(imageData.base64)) {
+                    newMap.delete(id);
+                }
+            }
+            return newMap;
+        });
+    };
 
-  const handleTitleChange = (event) => {
-    setBoard({
-      ...board,
-      title: event.target.value
-    });
-  };
+    const imageHandler = () => {
+        const fileInput = document.createElement('input');
+        fileInput.setAttribute('type', 'file');
+        fileInput.accept = "image/*";
 
-  const imageHandler = () => {
-        const input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
+        fileInput.click();
 
-        input.onchange = async () => {
-            const file = input.files[0];
+        fileInput.addEventListener("change", async function () {
+            const file = this.files[0];
             if (!file) return;
-
             if (!validateFile(file)) return;
 
             const reader = new FileReader();
             reader.onload = () => {
+                const base64 = reader.result;
                 const quill = quillRef.current.getEditor();
                 const range = quill.getSelection();
-                const position = range ? range.index : 0;
 
-                quill.insertEmbed(position, 'image', reader.result);
-                quill.setSelection(position + 1);
+                const tempId = `temp-${Date.now()}`;
 
-                const formData = new FormData();
-                const saveName = `${Date.now()}_${file.name}`;
+                quill.insertEmbed(range.index, 'image', base64);
 
-                formData.append('file', file);
-                formData.append('request', new Blob([JSON.stringify({
-                    saveName: saveName,
-                    originalName: file.name
-                })], { type: 'application/json' }));
-
-                imageMutation.mutate(formData);
+                setTempImages(prev => new Map(prev.set(tempId, {
+                    file,
+                    base64
+                })));
             };
             reader.readAsDataURL(file);
-        };
+        });
+    };
 
-        input.click();
-  }
-    const replaceBase64WithImageInfo = (content) => {
-        let newContent = content;
+    useEffect(() => {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('user='));
 
-        for (const [base64Url, imageInfo] of imageMap.entries()) {
-            const imageData = {
-                path: imageInfo.savePath
-            };
-
-            newContent = newContent.replace(base64Url, JSON.stringify(imageData));
+        if (cookieValue) {
+            const userInfo = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+            setBoard(prevBoard => ({
+                ...prevBoard,
+                email: userInfo.email,
+                username: userInfo.username
+            }));
         }
 
-        return newContent;
+        titleRef.current?.focus();
+    }, []);
+
+    const handleTitleChange = (event) => {
+        setBoard({
+            ...board,
+            title: event.target.value
+        });
     };
 
-  const modules = useMemo(() => {
-    return {
-      toolbar: {
-        container: [
-          [{size: ['small', false, 'large', 'huge']}],
-          [{align: []}],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{list: 'ordered'}, {list: 'bullet'}],
-          [{color: []}, {background: []}],
-          ['image'],
-        ],
-        handlers: {
-          image: imageHandler,
+    const modules = useMemo(() => ({
+        toolbar: {
+            container: [
+                [{ size: ['small', false, 'large', 'huge'] }],
+                [{ align: [] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ list: 'ordered' }, { list: 'bullet' }],
+                [{ color: [] }, { background: [] }],
+                ['image'],
+            ],
+            handlers: {
+                image: imageHandler,
+            },
         },
-      },
+    }), []);
+
+    const handleClickWrite = async () => {
+        if (!board.title.trim()) {
+            alert('제목을 입력해주세요.');
+            return;
+        }
+
+        if (!values.trim()) {
+            alert('내용을 입력해주세요.');
+            return;
+        }
+
+        try {
+            const imageUploadPromises = Array.from(tempImages.values()).map(async ({file}) => {
+                const formData = new FormData();
+                formData.append('uploadImage', file);
+                return uploadImage(formData);
+            });
+
+            const uploadedImages = await Promise.all(imageUploadPromises);
+
+            let finalContent = values;
+            tempImages.forEach(({ base64 }) => {
+                const imageInfo = uploadedImages.find(img => img.originalName === [...tempImages.values()]
+                    .find(temp => temp.base64 === base64)?.file.name);
+                if (imageInfo) {
+                    finalContent = finalContent.replace(base64, imageInfo.savePath);
+                }
+            });
+
+            const formData = new FormData();
+
+            fileStore.forEach((file) => {
+                formData.append("files", file);
+            });
+
+            formData.append("username", board.username);
+            formData.append("email", board.email);
+            formData.append("title", board.title);
+            formData.append("content", finalContent);
+
+            if (uploadedImages.length > 0) {
+                const lastImage = uploadedImages[uploadedImages.length - 1];
+                formData.append("savePath", lastImage.savePath);
+                formData.append("originalName", lastImage.originalName);
+                formData.append("saveName", lastImage.saveName);
+            }
+
+            await boardMutation.mutateAsync(formData);
+            toast.success("글이 작성되었습니다.");
+            moveToMain();
+
+        } catch (error) {
+            console.error('작성 실패:', error);
+            if (error.response?.data?.ERROR === 'REQUIRED_LOGIN') {
+                setOpen(true);
+            }
+            toast.error("글 작성에 실패했습니다.");
+        }
     };
-  }, []);
-
-  const handleClickWrite = () => {
-    if (!board.title.trim()) {
-      alert('제목을 입력해주세요.');
-      return;
-    }
-
-    if (!values.trim()) {
-      alert('내용을 입력해주세요.');
-      return;
-    }
-
-
-    const formData = new FormData()
-
-    for (let i = 0; i < fileStore.length; i++) {
-      formData.append("files", fileStore[i])
-    }
-
-    if (imageMap.size) {
-        const imageInfo = [...imageMap.values()][0];
-        formData.append("save_path", imageInfo.savePath);
-        formData.append("originalName", imageInfo.originalName);
-        formData.append("saveName", imageInfo.saveName);
-        console.log("save_path"+imageInfo.savePath)
-
-    }
-
-
-      formData.append("username", board.username);
-      formData.append("email", board.email);
-      formData.append("title", board.title);
-      formData.append("content", replaceBase64WithImageInfo(values));
-
-      if (uploadedImage) {
-          formData.append("savePath", uploadedImage.savePath);
-          formData.append("originalName", uploadedImage.originalName);
-          formData.append("saveName", uploadedImage.saveName);
-      }
-
-      boardMutation.mutate(formData, {
-          onSuccess: () => {
-              toast.success("글이 작성되었습니다.");
-              moveToMain();
-          },
-          onError: (error) => {
-              console.error('작성 실패:', error);
-              if (error.response.data.ERROR === 'REQUIRED_LOGIN'){
-                setOpen(true)
-              }
-          }
-      });
-  }
 
   const handleClickFileClear = (index) => {
     const updatedFileStore = fileStore.filter((_,i) => i !== index)
@@ -285,57 +248,57 @@ const WriteComponent = () => {
       ])
   }
 
-  const handleClickClose = () => {
-    setOpen(false)
-  }
+    const handleClickClose = () => {
+        setOpen(false);
+    };
 
-  if (!isLogin){
-    return moveToLoginReturn()
-  }
+    if (!isLogin) {
+        return moveToLoginReturn();
+    }
 
-  return (
-      <div style={{display: 'flex', flexDirection: 'column', padding: '20px'}}>
-        <TextFieldComponent
-            label="작성자"
-            value={board.username}
-            InputProps={{
-              readOnly: true,
-            }}
-            variant="outlined"
-            fullWidth
-        />
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
+            <TextFieldComponent
+                label="작성자"
+                value={board.username}
+                InputProps={{ readOnly: true }}
+                variant="outlined"
+                fullWidth
+            />
 
-        <TextField
-            ref={titleRef}
-            style={{marginTop: 10}}
-            label="제목"
-            value={board.title}
-            onChange={handleTitleChange}
-            variant="outlined"
-            fullWidth
-            required
-            placeholder="제목을 입력해주세요"
-            autoFocus
-        />
+            <TextField
+                ref={titleRef}
+                style={{ marginTop: 10 }}
+                label="제목"
+                value={board.title}
+                onChange={handleTitleChange}
+                variant="outlined"
+                fullWidth
+                required
+                placeholder="제목을 입력해주세요"
+                autoFocus
+            />
 
-        <div style={{height: '500px', border: '1px solid #ccc'}}>
-          <ReactQuill
-              ref={quillRef}
-              theme="snow"
-              modules={modules}
-              formats={formats}
-              onChange={setValues}
-              value={values}
-              style={{height: '100%'}}
-          />
+            <div style={{ height: '500px', border: '1px solid #ccc', marginTop: 10 }}>
+                <ReactQuill
+                    ref={quillRef}
+                    theme="snow"
+                    modules={modules}
+                    formats={formats}
+                    value={values}
+                    onChange={handleEditorChange}
+                    style={{ height: '100%' }}
+                />
+            </div>
 
-        </div>
-        <FileUploadComponent
-            handleChangeUploadFile={handleChangeUploadFile}
-        />
-        {fileStore.length > 0? fileStore.map((uploadFile, index) => (
-            <ListItem key={index}
-                      secondaryAction={
+            <FileUploadComponent
+                handleChangeUploadFile={handleChangeUploadFile}
+            />
+
+            {fileStore.length > 0 ? fileStore.map((uploadFile, index) => (
+                <ListItem
+                    key={index}
+                    secondaryAction={
                         <IconButton
                             name={uploadFile.name}
                             onClick={() => handleClickFileClear(index)}
