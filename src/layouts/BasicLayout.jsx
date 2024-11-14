@@ -5,10 +5,10 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import MenuIcon from '@mui/icons-material/Menu';
+import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search';
 import {Button, InputLabel, Select} from "@mui/material";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import useCustomMove from "../hooks/useCustomMove.jsx";
 import {useLocation} from "react-router-dom";
 import useCustomLogin from "../hooks/useCustomLogin.jsx";
@@ -181,7 +181,7 @@ export default function BasicLayout({ children }) {
                 aria-label="open drawer"
                 sx={{ mr: 2, '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}
             >
-              <MenuIcon />
+              <HomeIcon />
             </IconButton>
             <Typography
                 variant="h6"
