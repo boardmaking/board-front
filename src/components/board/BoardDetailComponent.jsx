@@ -107,7 +107,6 @@ const BoardDetailComponent = () => {
 
 
   return (
-
       <Box sx={{maxWidth: '800px', margin: '0 auto', padding: '20px'}}>
         <Paper elevation={3} sx={{padding: 3, marginBottom: 3}}>
           <h2>{title}</h2>
@@ -121,12 +120,24 @@ const BoardDetailComponent = () => {
             <span>작성일: {createAt}</span>
           </Box>
           <Divider sx={{margin: '20px 0'}}/>
-          <div
-              style={{
+          <Box
+              sx={{
                 minHeight: '200px',
-                '& img': {maxWidth: '100%', height: 'auto'},
-                '& p': {margin: '1em 0'},
-                '& ul, & ol': {marginLeft: '2em'},
+                '& img': {
+                  maxWidth: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  margin: '1em auto',
+                  objectFit: 'contain',
+                  maxHeight: '600px'
+                },
+                '& p': {
+                  margin: '1em 0',
+                  wordWrap: 'break-word'
+                },
+                '& ul, & ol': {
+                  marginLeft: '2em'
+                },
                 '& blockquote': {
                   borderLeft: '4px solid #ddd',
                   marginLeft: 0,

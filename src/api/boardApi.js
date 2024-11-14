@@ -33,9 +33,12 @@ export const postModify = async (params) => {
 
 export const uploadImage = async (params) => {
   console.log("이미지 업로드")
-  return (await axios.post(`${IMAGE}/upload`, params)).data
+  return (await axios.post(`${IMAGE}/upload`, params, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    }
+  })).data
 }
-
 export const postDownload = async (params) => {
   return (await jwtAxios.post(`${BOARD}/download`,params,{responseType:'blob'})).data
 
