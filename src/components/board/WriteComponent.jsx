@@ -20,6 +20,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ClearIcon from '@mui/icons-material/Clear';
 import ModalComponent from "../common/ModalComponent.jsx";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
+import ClassificationComponent from "./ClassificationComponent.jsx";
 
 const formats = [
   'font',
@@ -56,6 +57,7 @@ const WriteComponent = () => {
         savePath: '',
         originalName: '',
         saveName: '',
+        classification: 'INFO',
     });
   const [fileStore, setFileStore] = useState([])
   const [open, setOpen] = useState(false)
@@ -79,6 +81,13 @@ const WriteComponent = () => {
         }
 
         return true;
+    };
+
+    const handleClassificationChange = (event) => {
+        setBoard({
+            ...board,
+            classification: event.target.value
+        });
     };
 
     const handleEditorChange = (content) => {
@@ -211,6 +220,7 @@ const WriteComponent = () => {
             formData.append("email", board.email);
             formData.append("title", board.title);
             formData.append("content", finalContent);
+            formData.append("classification", board.classification)
 
             if (uploadedImages.length > 0) {
                 const lastImage = uploadedImages[uploadedImages.length - 1];
@@ -277,6 +287,11 @@ const WriteComponent = () => {
                 required
                 placeholder="제목을 입력해주세요"
                 autoFocus
+            />
+
+            <ClassificationComponent
+                value={board.classification}
+                onChange={handleClassificationChange}
             />
 
             <div style={{ height: '500px', border: '1px solid #ccc', marginTop: 10 }}>

@@ -9,6 +9,9 @@ import useCustomMove from "../../hooks/useCustomMove.jsx";
 import { toast } from "react-toastify";
 import { useParams } from 'react-router-dom';
 import { getCookie } from "../../util/cookieUtil.jsx";
+import useCustomLogin from "../../hooks/useCustomLogin.jsx";
+import ClassificationComponent from "./ClassificationComponent.jsx";
+import ModalComponent from "../common/ModalComponent.jsx";
 
 const formats = [
     'font', 'header', 'bold', 'italic', 'underline', 'strike',
@@ -19,6 +22,7 @@ const formats = [
 const ModifyComponent = () => {
     const { id: boardId } = useParams();
     const { moveToMain } = useCustomMove();
+    const { isLogin, moveToLoginReturn } = useCustomLogin();
     const quillRef = useRef(null);
     const titleRef = useRef(null);
     const [imageMap, setImageMap] = useState(new Map());
@@ -29,6 +33,8 @@ const ModifyComponent = () => {
         email: userInfo?.email || '',
         title: '',
         userId: userInfo?.id || '',
+        username: userInfo?.username || '',
+        classification: 'INFO',
     });
 
     const [values, setValues] = useState('');
@@ -48,10 +54,18 @@ const ModifyComponent = () => {
             setBoard(prev => ({
                 ...prev,
                 title: boardData.title,
+                classification: boardData.classification || 'INFO',
             }));
             setValues(boardData.content);
         }
     }, [boardData]);
+
+    const handleClassificationChange = (event) => {
+        setBoard(prev => ({
+            ...prev,
+            classification: event.target.value
+        }));
+    };
 
     const boardMutation = useMutation({
         mutationFn: (board) => postModify(board)
@@ -103,7 +117,7 @@ const ModifyComponent = () => {
         },
     }), []);
 
-    const handleClickUpdate = () => {
+    const handleClickUpdate = async () => {
         if (!board.title.trim()) {
             alert('제목을 입력해주세요.');
             return;
@@ -130,9 +144,11 @@ const ModifyComponent = () => {
 
         const modifiedBoard = {
             boardId: board.boardId,
+            username: board.username,
             email: board.email,
             title: board.title,
             content: replaceBase64WithImageInfo(values),
+            classification: board.classification,
             userId: board.userId
         };
 
@@ -152,7 +168,7 @@ const ModifyComponent = () => {
         <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
             <TextFieldComponent
                 label="작성자"
-                value={userInfo?.email || ''}
+                value={board.username}
                 InputProps={{
                     readOnly: true,
                 }}
@@ -171,6 +187,11 @@ const ModifyComponent = () => {
                 required
                 placeholder="제목을 입력해주세요"
                 autoFocus
+            />
+
+            <ClassificationComponent
+                value={board.classification}
+                onChange={handleClassificationChange}
             />
 
             <div style={{ height: '500px', border: '1px solid #ccc', marginTop: 10 }}>
