@@ -13,6 +13,7 @@ const USER4 = import.meta.env.VITE_API_USER4
 const USER5 = import.meta.env.VITE_API_USER5
 const USER6 = import.meta.env.VITE_API_USER6
 const USER7 = import.meta.env.VITE_API_USER7
+const USER8 = import.meta.env.VITE_API_USER8
 
 const initState = {
     email: '',
@@ -193,6 +194,7 @@ function JoinComponent() {
                         <MenuItem value={USER5}>{USER5}</MenuItem>
                         <MenuItem value={USER6}>{USER6}</MenuItem>
                         <MenuItem value={USER7}>{USER7}</MenuItem>
+                        <MenuItem value={USER8}>{USER8}</MenuItem>
                     </Select>
 
                     <TextFieldComponent
