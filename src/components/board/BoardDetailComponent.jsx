@@ -21,6 +21,8 @@ import FolderIcon from "@mui/icons-material/Folder";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CommentComponent from "../comment/CommentComponent.jsx";
 import ModalComponent from "../common/ModalComponent.jsx";
+import PauseIcon from '@mui/icons-material/Pause';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {useState} from "react";
 
 const BoardDetailComponent = () => {
@@ -34,6 +36,8 @@ const BoardDetailComponent = () => {
   } = location.state || {};
   const {id: boardId} = useParams();
   const [open, setOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [hasDownloaded, setHasDownloaded] = useState(false)
   const userInfo = getCookie('user');
 
   const boardMutation = useMutation({
@@ -78,8 +82,8 @@ const BoardDetailComponent = () => {
   const handleClickDownload = (uploadFileName) => {
     if (isSuccess) {
       const fileName = uploadFileName
-      console.log(fileName)
       const params = {boardId: data.boardId, fileName: fileName}
+      setIsLoading(true)
       postDownload(params).then(data => {
         const url = window.URL.createObjectURL(new Blob([data]))
         const link = document.createElement('a')
@@ -89,10 +93,15 @@ const BoardDetailComponent = () => {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-      }).catch(err => {
-        if(err.response.data.ERROR === "REQUIRED_LOGIN"){
+        setHasDownloaded(true)
+      })
+      .catch(err => {
+        if (err.response.data.ERROR === "REQUIRED_LOGIN") {
           setOpen(true)
+          setIsLoading(false)
+          setHasDownloaded(false)
         }
+
       })
     }
   }
@@ -104,7 +113,6 @@ const BoardDetailComponent = () => {
   const Demo = styled('div')(({theme}) => ({
     backgroundColor: theme.palette.background.paper,
   }));
-
 
   return (
       <Box sx={{maxWidth: '800px', margin: '0 auto', padding: '20px'}}>
@@ -148,18 +156,27 @@ const BoardDetailComponent = () => {
           />
           {isSuccess && data.uploadFileNameList.length !== 0 ?
               <Demo>
-                <List >
+                <List>
                   {data.uploadFileNameList.map((uploadFileName, index) => (
                       <ListItem key={index}
                                 secondaryAction={
                                   <IconButton
-                                      onClick={() => handleClickDownload(uploadFileName)}
+                                      disabled={isLoading
+                                          || hasDownloaded}
+                                      onClick={() => handleClickDownload(
+                                          uploadFileName)}
                                       name={uploadFileName}
                                       edge="end"
                                       aria-label="download">
-                                    <FileDownloadIcon
-                                        name={uploadFileName}
-                                    />
+                                    {isLoading ?
+                                        <PauseIcon/>
+                                        : hasDownloaded ?
+                                            <CheckCircleIcon/>
+                                            :
+                                            <FileDownloadIcon
+                                                name={uploadFileName}
+                                            />
+                                    }
                                   </IconButton>
                                 }
                       >
@@ -192,10 +209,10 @@ const BoardDetailComponent = () => {
         </Paper>
         <CommentComponent/>
         <ModalComponent
-        title={"회원 전용 기능"}
-        content={"회원이 아니어서 파일을 다운로드할 수 없습니다. 로그인 해주세요:)"}
-        handleClose={handleClickClose}
-        open={open}
+            title={"회원 전용 기능"}
+            content={"회원이 아니어서 파일을 다운로드할 수 없습니다. 로그인 해주세요:)"}
+            handleClose={handleClickClose}
+            open={open}
         />
       </Box>
   );
