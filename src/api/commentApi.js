@@ -1,9 +1,10 @@
 import axios from "axios";
 import {COMMENT} from "./config.js";
+import jwtAxios from "../util/jwtUtil.jsx";
 
 export const postComment = async (params) => {
     console.log(params)
-    return (await axios.post(`${COMMENT}`, params)).data
+    return (await jwtAxios.post(`${COMMENT}`, params)).data
 }
 
 export const getList = async (boardId) => {
