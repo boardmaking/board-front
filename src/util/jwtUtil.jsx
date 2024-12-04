@@ -13,6 +13,7 @@ const refreshJwt = async (accessToken, refreshToken) => {
 
 const beforeReq = (config) => {
   const memberInfo = getCookie('user');
+  console.log("들어옴")
   if (!memberInfo) {
     console.log('USER NOT FOUND')
     return Promise.reject(
@@ -34,6 +35,7 @@ const requestFail = (err) => {
 
 const beforeRes = async (res) => {
   const data = res.data
+  console.log(data)
   if (data && data.error === 'ERROR_ACCESS_TOKEN') {
     const memberCookieValue = getCookie('user')
     const result = await refreshJwt(memberCookieValue.accessToken,
