@@ -93,6 +93,7 @@ const BoardDetailComponent = () => {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
+        setIsLoading(false)
         setHasDownloaded(true)
       })
       .catch(err => {
