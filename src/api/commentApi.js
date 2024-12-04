@@ -11,3 +11,9 @@ export const getList = async (boardId) => {
     console.log("댓글 리스트 불러오기" + boardId)
     return (await axios.get(`${COMMENT}/${boardId}`)).data
 }
+
+export const deleteComment = async (param) => {
+    const commentId = param.commentId
+    const userId = param.userId
+    return (await jwtAxios.delete(`${COMMENT}/${commentId}`,{data: {userId}})).data
+}

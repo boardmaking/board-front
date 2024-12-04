@@ -238,7 +238,12 @@ const WriteComponent = () => {
             if (error.response?.data?.ERROR === 'REQUIRED_LOGIN') {
                 setOpen(true);
             }
+            if (error.response.data.statusCode === 413){
+            toast.error("최대 20MB 까지 업로드 가능합니다.");
+            }else {
             toast.error("글 작성에 실패했습니다.");
+            }
+
         }
     };
 
