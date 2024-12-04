@@ -48,6 +48,7 @@ const WriteComponent = () => {
     const quillRef = useRef(null);
     const titleRef = useRef(null);
     const [tempImages, setTempImages] = useState(new Map());
+  const [fileError, setFileError] = useState(null)
     const [board, setBoard] = useState({
         email: '',
         title: '',
@@ -210,11 +211,25 @@ const WriteComponent = () => {
                 }
             });
 
+            const TOTAL_FILE_MAX_SIZE = 80 * 1024 * 1024;
             const formData = new FormData();
-
+            let totalFileSize = 0;
             fileStore.forEach((file) => {
+              totalFileSize += file.size
                 formData.append("files", file);
             });
+            try {
+
+              console.log(totalFileSize)
+            if (totalFileSize > TOTAL_FILE_MAX_SIZE){
+              throw new Error(
+                  `파일 크기가 너무 큽니다. 최대 크기: ${TOTAL_FILE_MAX_SIZE / (1024 * 1024)}MB`
+              )
+            }
+            }catch (err){
+              setFileError(err)
+              setOpen(true)
+            }
 
             formData.append("username", board.username);
             formData.append("email", board.email);
@@ -254,17 +269,32 @@ const WriteComponent = () => {
   }
 
   const handleChangeUploadFile = (e) => {
+    const FILE_MAX_SIZE = 20 * 1024 * 1024;
+    try {
+
     board[e.target.name] = e.target.files
     setBoard({...board})
     const files = board.files
+      const fileList = Array.from(files);
+      for (let i = 0; i < fileList.length; i++) {
+        if (fileList[i].size > FILE_MAX_SIZE) {
+          throw new Error(
+              `파일 크기가 너무 큽니다. 최대 크기: ${FILE_MAX_SIZE / (1024 * 1024)}MB`);
+        }
+      }
       setFileStore((fileStore) => [
         ...fileStore,
             ...Array.from(files)
       ])
+    }catch (err){
+      setFileError(err.message)
+      setOpen(true)
+    }
   }
 
     const handleClickClose = () => {
         setOpen(false);
+        setFileError(null)
     };
 
     if (!isLogin) {
@@ -355,6 +385,14 @@ const WriteComponent = () => {
             handleClose={handleClickClose}
             open={open}
         />
+          {fileError?
+            <ModalComponent
+            title={"파일 에러"}
+            content={fileError}
+            handleClose={handleClickClose}
+            open={open}
+            />:<></>
+          }
       </div>
   );
 };
