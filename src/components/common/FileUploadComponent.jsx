@@ -26,13 +26,8 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-const initState = []
 
-/*function FolderIcon() {
-  return null;
-}*/
-
-export default function FileUploadComponent({handleChangeUploadFile}) {
+export default function FileUploadComponent({handleChangeUploadFile,refresh}) {
 
 
   return (
@@ -44,10 +39,11 @@ export default function FileUploadComponent({handleChangeUploadFile}) {
           tabIndex={-1}
           startIcon={<CloudUploadIcon/>}
       >
-        Upload files
+        Upload files (~20MB)
         <VisuallyHiddenInput
             name={"files"}
             type="file"
+            value={refresh}
             onChange={handleChangeUploadFile}
             multiple
         />
