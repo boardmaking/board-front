@@ -32,10 +32,12 @@ const loginSlice = createSlice({
       if(!payload.ERROR){
         setCookie("user",JSON.stringify(payload))
       }
+      const userId = payload.id
       const email = payload.email
       const roles = payload.roles
       const username = payload.username
       return {
+        userId,
         email,
         roles,
         username,
