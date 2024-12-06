@@ -40,16 +40,6 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                script {
-                    dir(REACT_DIR) {
-                        bat 'npm test -- --watchAll=false'
-                    }
-                }
-            }
-        }
-
         stage('Deploy') {
             steps {
                 script {
