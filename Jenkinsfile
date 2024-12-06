@@ -61,7 +61,6 @@ pipeline {
                     bat """
                         echo Starting Nginx...
                         start \"Nginx\" \"${NGINX_PATH}\\nginx.exe\" -c \"${NGINX_CONF}\"
-                        timeout /T 5 /NOBREAK
                         echo Nginx started successfully.
                     """
                 }
