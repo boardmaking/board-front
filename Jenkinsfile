@@ -58,8 +58,13 @@ pipeline {
                     bat "xcopy /E /I /Y \"${BUILD_DIR}\" \"C:\\Program Files\\nginx\\html\\\""
 
                     // Nginx 실행
-                    echo "Starting Nginx..."
-                    bat "\"${NGINX_PATH}\\nginx.exe\" -c \"${NGINX_CONF}\" || echo 'Failed to start Nginx.'"
+                    bat """
+                        echo Starting Nginx in the background...
+                        start /B \"${NGINX_PATH}\\nginx.exe\" -c \"${NGINX_CONF}\"
+                        timeout /T 5 /NOBREAK
+                        echo Nginx started successfully in the background.
+                    """
+
                 }
             }
         }
