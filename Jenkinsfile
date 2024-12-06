@@ -59,12 +59,11 @@ pipeline {
 
                     // Nginx 실행
                     bat """
-                        echo Starting Nginx in the background...
-                        start /B \"${NGINX_PATH}\\nginx.exe\" -c \"${NGINX_CONF}\"
+                        echo Starting Nginx...
+                        start \"Nginx\" \"${NGINX_PATH}\\nginx.exe\" -c \"${NGINX_CONF}\"
                         timeout /T 5 /NOBREAK
-                        echo Nginx started successfully in the background.
-                    """
-
+                        echo Nginx started successfully.
+                    """"
                 }
             }
         }
