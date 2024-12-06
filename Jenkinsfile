@@ -55,7 +55,7 @@ pipeline {
                     echo "Copying build files to Nginx HTML directory..."
                     bat "echo BUILD_DIR: ${BUILD_DIR}"
                     bat "echo NGINX HTML DIR: C:\\Program Files\\nginx\\html\\"
-                    bat "xcopy /E /I /Y ${BUILD_DIR} C:\\Program Files\\nginx\\html\\"
+                    bat "xcopy /E /I /Y \"${BUILD_DIR}\" \"C:\\Program Files\\nginx\\html\\\""
 
                     // Nginx 실행
                     echo "Starting Nginx..."
