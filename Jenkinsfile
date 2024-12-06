@@ -5,7 +5,6 @@ pipeline {
     }
 
     environment {
-        // React 프로젝트의 경로
         REACT_DIR = 'C:\\ProgramData\\Jenkins\\workspace\\workspace\\board-client\\'
         BUILD_DIR = 'C:\\ProgramData\\Jenkins\\workspace\\workspace\\board-client\\dist'
         NGINX_PATH = 'C:\\Program Files\\nginx'
@@ -47,7 +46,10 @@ pipeline {
 
                     // Nginx 프로세스 종료 시도
                     echo "Stopping any running Nginx processes..."
-                    bat "taskkill /F /IM nginx.exe || echo 'Nginx is not running or already stopped.'"
+                    bat '''
+                        taskkill /F /IM nginx.exe || echo "Nginx is not running or already stopped."
+                        exit 0
+                    '''
 
                     // 빌드된 파일을 Nginx의 html 디렉토리로 복사
                     echo "Copying build files to Nginx HTML directory..."
