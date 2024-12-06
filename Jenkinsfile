@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         // React 프로젝트의 경로
-        REACT_DIR = 'C:\\ProgramData\\Jenkins\\workspace\\workspace\\board-front\\'
-        BUILD_DIR = 'C:\\ProgramData\\Jenkins\\workspace\\workspace\\board-front\\dist'
+        REACT_DIR = 'C:\\ProgramData\\Jenkins\\workspace\\workspace\\board-client\\'
+        BUILD_DIR = 'C:\\ProgramData\\Jenkins\\workspace\\workspace\\board-client\\dist'
         NGINX_PATH = 'C:\\Program Files\\nginx'
         NGINX_CONF = 'C:\\Program Files\\nginx\\conf\\nginx.conf'
         NGINX_LOGS = 'C:\\Program Files\\nginx\\logs'
