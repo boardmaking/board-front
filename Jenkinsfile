@@ -43,18 +43,25 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                echo "Deploying React app with Nginx..."
-                                    echo "Stopping any running Nginx processes..."
-                                    bat "taskkill /F /IM nginx.exe || echo 'Nginx is not running.'"
+                    echo "Deploying React app with Nginx..."
 
-                                    echo "Copying build files to Nginx HTML directory..."
-                                    bat "xcopy /E /I /Y ${BUILD_DIR} C:\\Program Files\\nginx\\html\\"
-                                    echo "Starting Nginx..."
-                                    bat "\"${NGINX_PATH}\\nginx.exe\" -c \"${NGINX_CONF}\""
+                    // Nginx 프로세스 종료 시도
+                    echo "Stopping any running Nginx processes..."
+                    bat "taskkill /F /IM nginx.exe || echo 'Nginx is not running or already stopped.'"
+
+                    // 빌드된 파일을 Nginx의 html 디렉토리로 복사
+                    echo "Copying build files to Nginx HTML directory..."
+                    bat "echo BUILD_DIR: ${BUILD_DIR}"
+                    bat "echo NGINX HTML DIR: C:\\Program Files\\nginx\\html\\"
+                    bat "xcopy /E /I /Y ${BUILD_DIR} C:\\Program Files\\nginx\\html\\"
+
+                    // Nginx 실행
+                    echo "Starting Nginx..."
+                    bat "\"${NGINX_PATH}\\nginx.exe\" -c \"${NGINX_CONF}\" || echo 'Failed to start Nginx.'"
                 }
             }
         }
-    }
+
 
     post {
         success {
