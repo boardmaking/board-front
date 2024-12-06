@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools {
+        nodejs 'nodejs 23.3'
+    }
 
     environment {
         // React 프로젝트의 경로
