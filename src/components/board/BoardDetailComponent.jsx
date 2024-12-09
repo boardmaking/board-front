@@ -36,8 +36,8 @@ const BoardDetailComponent = () => {
   } = location.state || {};
   const {id: boardId} = useParams();
   const [open, setOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasDownloaded, setHasDownloaded] = useState(false)
+  const [isLoading, setIsLoading] = useState({})
+  const [hasDownloaded, setHasDownloaded] = useState({})
   const userInfo = getCookie('user');
 
   const boardMutation = useMutation({
@@ -79,11 +79,11 @@ const BoardDetailComponent = () => {
     }
   };
 
-  const handleClickDownload = (uploadFileName) => {
+  const handleClickDownload = (uploadFileName,index) => {
     if (isSuccess) {
       const fileName = uploadFileName
       const params = {boardId: data.boardId, fileName: fileName}
-      setIsLoading(true)
+      setIsLoading(prev => ({...prev,[index]: true}))
       postDownload(params).then(data => {
         const url = window.URL.createObjectURL(new Blob([data]))
         const link = document.createElement('a')
@@ -93,8 +93,8 @@ const BoardDetailComponent = () => {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        setIsLoading(false)
-        setHasDownloaded(true)
+        setIsLoading(prev => ({...prev,[index]: false}))
+        setHasDownloaded(prev => ({...prev,[index]: true}))
       })
       .catch(err => {
         if (err.response.data.ERROR === "REQUIRED_LOGIN") {
@@ -162,16 +162,14 @@ const BoardDetailComponent = () => {
                       <ListItem key={index}
                                 secondaryAction={
                                   <IconButton
-                                      disabled={isLoading
-                                          || hasDownloaded}
-                                      onClick={() => handleClickDownload(
-                                          uploadFileName)}
+                                      disabled={isLoading[index] || hasDownloaded[index]}
+                                      onClick={() => handleClickDownload(uploadFileName, index)}
                                       name={uploadFileName}
                                       edge="end"
                                       aria-label="download">
-                                    {isLoading ?
+                                    {isLoading[index] ?
                                         <PauseIcon/>
-                                        : hasDownloaded ?
+                                        : hasDownloaded[index] ?
                                             <CheckCircleIcon/>
                                             :
                                             <FileDownloadIcon
