@@ -95,36 +95,44 @@ const WriteComponent = () => {
     });
   };
 
-  const handleEditorChange = (content) => {
+  const handleEditorChange = async (content) => {
     const imgTagRegex = /<img[^>]*>/g;
+    let updatedContent = content;
     const imgTags = content.match(imgTagRegex);
 
     if (imgTags) {
-      imgTags.forEach(async (imgTag) => {
-        const base64Data = imgTag.match(/data:image\/([a-zA-Z]*);base64,([A-Za-z0-9+\/=]+)/);
-        if (base64Data) {
-          const blob = base64ToBlob(base64Data[2], base64Data[1]);
-          const uuid = uuidv4()
-          const imagePlace = `[${uuid}]`
-          const contentWithoutImages = content.replace(imgTagRegex, `[${uuid}]`);
-          const formData = new FormData();
-          formData.append('image', blob, uuid+'.'+base64Data[1]);
-          console.log(contentWithoutImages)
-            uploadImage(formData).then(data => {
-              console.log(data.savePath)
-              content = contentWithoutImages.replace(imagePlace, `<img src="${data.savePath}"  alt=${uuid}/>`);
-              console.log(content)
-              setValues(content)
-            }).catch(err=>{
-              console.log(err)
-            })
-        }
+      const imageUploadPromises = imgTags.map((imgTag) => {
+        // eslint-disable-next-line no-async-promise-executor
+        return new Promise(async (resolve, reject) => {
+          const base64Data = imgTag.match(/data:image\/([a-zA-Z]*);base64,([A-Za-z0-9+\/=]+)/);
+          if (base64Data) {
+            const blob = base64ToBlob(base64Data[2], base64Data[1]);
+            const uuid = uuidv4();
+            const imagePlace = `[${uuid}]`;
+            const contentWithoutImages = updatedContent.replace(imgTag, imagePlace);
+            const formData = new FormData();
+            formData.append('image', blob, uuid + '.' + base64Data[1]);
+
+            try {
+              const data = await uploadImage(formData);
+              updatedContent = contentWithoutImages.replace(imagePlace, `<img src="${data.savePath}" alt="${uuid}" />`);
+              resolve();
+            } catch (err) {
+              reject(err);
+            }
+          } else {
+            resolve();
+          }
+        });
       });
-    }else {
-    console.log(content)
-    setValues(content);
+
+      await Promise.all(imageUploadPromises);
+      setValues(updatedContent);
+    } else {
+      setValues(content);
     }
   };
+
 
   const imageHandler = () => {
     const fileInput = document.createElement('input');
