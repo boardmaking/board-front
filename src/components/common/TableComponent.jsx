@@ -20,6 +20,7 @@ import BugReportIcon from '@mui/icons-material/BugReport';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import encryptUtil from "../../util/encryptUtil.js";
 
 const StyledButton = styled(Button)(({theme}) => ({
     margin: theme.spacing(1),
@@ -76,7 +77,8 @@ export default function TableComponent() {
     const navigate = useNavigate();
     const {category, search, refresh} = useCustomMove();
     const [totalItems, setTotalItems] = useState(0);
-
+    const {encodedEncryptedData} = encryptUtil(search,category)
+    console.log(encodedEncryptedData)
     const {data} = useQuery({
         queryKey: ['boardList', {category, search, refresh}],
         queryFn: () => getList({category, search}),
