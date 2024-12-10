@@ -28,7 +28,7 @@ export const postModify = async (params) => {
 }
 
 export const uploadImage = async (params) => {
-  return (await axios.post(`${IMAGE}/upload`, params, {
+  return (await jwtAxios.post(`${IMAGE}/upload`, params, {
     headers: {
       'Content-Type': 'multipart/form-data',
     }
