@@ -209,25 +209,26 @@ const WriteComponent = () => {
     }
 
     try {
-      const imageUploadPromises = Array.from(tempImages.values()).map(async ({ file }) => {
-        const formData = new FormData();
-        formData.append('uploadImage', file);
-        // return uploadImage(formData);
-      });
+      // const imageUploadPromises = Array.from(tempImages.values()).map(async ({ file }) => {
+      //   const formData = new FormData();
+      //   formData.append('uploadImage', file);
+      //   // return uploadImage(formData);
+      // });
 
-      const uploadedImages = await Promise.all(imageUploadPromises);
+      // const uploadedImages = await Promise.all(imageUploadPromises);
 
       let finalContent = values;
-      tempImages.forEach(({ base64 }) => {
-        const imageInfo = uploadedImages.find(
-            (img) => img.originalName === [...tempImages.values()]
-            .find((temp) => temp.base64 === base64)?.file.name
-        );
-        if (imageInfo) {
-          finalContent = finalContent.replace(base64, imageInfo.savePath);
-        }
-      });
-
+      /*if (tempImages.size > 0) {
+        tempImages.forEach(({base64}) => {
+          const imageInfo = uploadedImages.find(
+              (img) => img.originalName === [...tempImages.values()]
+              .find((temp) => temp.base64 === base64)?.file.name
+          );
+          if (imageInfo) {
+            finalContent = finalContent.replace(base64, imageInfo.savePath);
+          }
+        });
+      }*/
       const TOTAL_FILE_MAX_SIZE = 80 * 1024 * 1024;
       const formData = new FormData();
       let totalFileSize = 0;
@@ -246,12 +247,12 @@ const WriteComponent = () => {
       formData.append('content', finalContent);
       formData.append('classification', board.classification);
 
-      if (uploadedImages.length > 0) {
-        const lastImage = uploadedImages[uploadedImages.length - 1];
-        formData.append('savePath', lastImage.savePath);
-        formData.append('originalName', lastImage.originalName);
-        formData.append('saveName', lastImage.saveName);
-      }
+      // if (uploadedImages.length > 0) {
+      //   const lastImage = uploadedImages[uploadedImages.length - 1];
+      //   formData.append('savePath', lastImage.savePath);
+      //   formData.append('originalName', lastImage.originalName);
+      //   formData.append('saveName', lastImage.saveName);
+      // }
 
       await boardMutation.mutateAsync(formData);
       toast.success('글이 작성되었습니다.');
