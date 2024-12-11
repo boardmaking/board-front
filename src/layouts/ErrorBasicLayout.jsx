@@ -144,16 +144,22 @@ export default function ErrorBasicLayout({ children }) {
   }
 
   return (
-      <Box sx={{ flexGrow: 1, minHeight: '100vh' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: 1, gap: 1 }}>
+      <Box sx={{flexGrow: 1, minHeight: '100vh'}}>
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          padding: 1,
+          gap: 1
+        }}>
           {isLoggedIn && userInfo ? (
               <>
                 <UserInfoTypography variant="subtitle1">
                   {userInfo.username}님 환영합니다
                 </UserInfoTypography>
-                {isAdmin() && pathname !== '/users/join' ?<StyledButton variant="outlined" onClick={handleClickJoin}>
+                {isAdmin() && pathname !== '/users/join' ? <StyledButton
+                    variant="outlined" onClick={handleClickJoin}>
                   회원가입하러 가기
-                </StyledButton> :<></>
+                </StyledButton> : <></>
 
                 }
                 <StyledButton variant="outlined" onClick={handleClickLogout}>
@@ -172,7 +178,7 @@ export default function ErrorBasicLayout({ children }) {
 
 
         </Box>
-        <StyledAppBar position="static" sx={{ borderRadius: '2px' }}>
+        <StyledAppBar position="static" sx={{borderRadius: '2px'}}>
           <Toolbar>
             <IconButton
                 size="large"
@@ -180,21 +186,29 @@ export default function ErrorBasicLayout({ children }) {
                 color="inherit"
                 onClick={moveToMain}
                 aria-label="open drawer"
-                sx={{ mr: 2, '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}
+                sx={{
+                  mr: 2,
+                  '&:hover': {backgroundColor: 'rgba(255,255,255,0.1)'}
+                }}
             >
-              <HomeIcon />
+              <HomeIcon/>
             </IconButton>
             <Typography
                 variant="h6"
                 noWrap
                 component="div"
-                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' }, fontWeight: 600, letterSpacing: '0.5px' }}
+                sx={{
+                  flexGrow: 1,
+                  display: {xs: 'none', sm: 'block'},
+                  fontWeight: 600,
+                  letterSpacing: '0.5px'
+                }}
             >
               이슈 게시판
             </Typography>
             <InputLabel
                 htmlFor="grouped-native-select"
-                sx={{ color: 'white', marginRight: 1, fontSize: '0.9rem' }}
+                sx={{color: 'white', marginRight: 1, fontSize: '0.9rem'}}
             >
               조건
             </InputLabel>
@@ -212,14 +226,14 @@ export default function ErrorBasicLayout({ children }) {
             </StyledSelect>
             <Search>
               <SearchIconWrapper>
-                <SearchIcon />
+                <SearchIcon/>
               </SearchIconWrapper>
               <StyledInputBase
                   name="search"
                   onChange={handleChangeSearch}
                   onKeyDown={handleKeyPress}
                   placeholder="Search…"
-                  inputProps={{ 'aria-label': 'search' }}
+                  inputProps={{'aria-label': 'search'}}
               />
             </Search>
           </Toolbar>
@@ -231,6 +245,7 @@ export default function ErrorBasicLayout({ children }) {
             </div>
           </div>
         </Box>
+        <a href="http://www.freepik.com">Designed by Freepik</a>
       </Box>
   );
 }
