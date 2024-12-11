@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useEffect } from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {
@@ -6,25 +6,25 @@ import {
     Button,
     List,
     ListItem,
-    ListItemAvatar, ListItemText,
+    ListItemAvatar,
+    ListItemText,
     TextField
 } from "@mui/material";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { postModify, getBoard } from "../../api/boardApi.js";
+import {useMutation, useQuery} from "@tanstack/react-query";
+import {getBoard, postModify} from "../../api/boardApi.js";
 import TextFieldComponent from "../common/TextFieldComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
-import { toast } from "react-toastify";
-import { useParams } from 'react-router-dom';
-import { getCookie } from "../../util/cookieUtil.jsx";
+import {toast} from "react-toastify";
+import {useParams} from 'react-router-dom';
+import {getCookie} from "../../util/cookieUtil.jsx";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import ClassificationComponent from "./ClassificationComponent.jsx";
-import ModalComponent from "../common/ModalComponent.jsx";
 import IconButton from "@mui/material/IconButton";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import FolderIcon from "@mui/icons-material/Folder";
 import {styled} from "@mui/material/styles";
 import ClearIcon from "@mui/icons-material/Clear";
 import FileUploadComponent from "../common/FileUploadComponent.jsx";
+import ModalComponent from "../common/ModalComponent.jsx";
 
 const formats = [
     'font', 'header', 'bold', 'italic', 'underline', 'strike',
@@ -40,7 +40,10 @@ const ModifyComponent = () => {
     const titleRef = useRef(null);
     const [imageMap, setImageMap] = useState(new Map());
     const userInfo = getCookie('user');
+    const [savedFileStore, setSavedFileStore] = useState([])
     const [fileStore, setFileStore] = useState([])
+    const [fileError, setFileError] = useState(null);
+    const [open, setOpen] = useState(false)
 
     const [board, setBoard] = useState({
         boardId: boardId,
@@ -49,7 +52,8 @@ const ModifyComponent = () => {
         userId: userInfo?.id || '',
         username: userInfo?.username || '',
         classification: 'INFO',
-        files: []
+        files: [],
+        newFiles: []
     });
 
     const [values, setValues] = useState('');
@@ -67,17 +71,16 @@ const ModifyComponent = () => {
 
     useEffect(() => {
         if (boardData && !board.title) {
+            console.log(boardData)
             setBoard(prev => ({
                 ...prev,
                 title: boardData.title,
                 classification: boardData.classification || 'INFO',
             }));
-            setFileStore((fileStore) => [
-                ...fileStore,
+            setSavedFileStore((savedFileStore) => [
+                ...savedFileStore,
                 ...Array.from(boardData.uploadFileNameList)
             ])
-            console.log(boardData)
-            console.log(board)
             board.files = boardData.uploadFileNameList
             setBoard(board)
             setValues(boardData.content);
@@ -151,9 +154,6 @@ const ModifyComponent = () => {
             alert('내용을 입력해주세요.');
             return;
         }
-        console.log(board)
-        board.files = fileStore
-        setBoard(board)
 
         const replaceBase64WithImageInfo = (content) => {
             let newContent = content;
@@ -169,18 +169,41 @@ const ModifyComponent = () => {
             return newContent;
         };
 
-        const modifiedBoard = {
-            boardId: board.boardId,
-            username: board.username,
-            email: board.email,
-            title: board.title,
-            content: replaceBase64WithImageInfo(values),
-            classification: board.classification,
-            userId: board.userId,
-            files: board.files
-        };
+        const TOTAL_FILE_MAX_SIZE = 80 * 1024 * 1024;
+        const formData = new FormData();
+        let totalFileSize = 0;
+        fileStore.forEach((file) => {
+            totalFileSize += file.size;
+            formData.append('newFiles', file);
+        });
 
-        boardMutation.mutate(modifiedBoard, {
+        if (totalFileSize > TOTAL_FILE_MAX_SIZE) {
+            throw new Error(`파일 크기가 너무 큽니다. 최대 크기: ${TOTAL_FILE_MAX_SIZE / (1024 * 1024)}MB`);
+        }
+
+        board.files = savedFileStore
+        setBoard(board)
+
+        formData.append('boardId',board.boardId)
+        formData.append('username',board.username)
+        formData.append('email',board.email)
+        formData.append('title',board.title)
+        formData.append('content',replaceBase64WithImageInfo(values))
+        formData.append('classification',board.classification)
+        formData.append('userId',board.userId)
+        formData.append('files',board.files)
+        // const modifiedBoard = {
+        //     boardId: board.boardId,
+        //     username: board.username,
+        //     email: board.email,
+        //     title: board.title,
+        //     content: replaceBase64WithImageInfo(values),
+        //     classification: board.classification,
+        //     userId: board.userId,
+        //     files: board.files
+        // };
+        //
+        boardMutation.mutate(formData, {
             onSuccess: () => {
                 toast.success("글이 수정되었습니다.");
                 moveToMain();
@@ -196,11 +219,46 @@ const ModifyComponent = () => {
         backgroundColor: theme.palette.background.paper,
     }));
 
-    const handleClickFileClear = (index) => {
-        const updatedFileStore = fileStore.filter((_,i) => i !== index)
-        setFileStore(updatedFileStore)
+    const handleClickSavedFileClear = (index) => {
+        const updatedSavedFileStore = savedFileStore.filter((_,i) => i !== index)
+        setSavedFileStore(updatedSavedFileStore)
     }
 
+    const handleClickFileClear = (index) => {
+        const updatedFileStore = fileStore.filter((_, i) => i !== index);
+        setFileStore(updatedFileStore);
+
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    };
+
+    const handleChangeUploadFile = (e) => {
+        const FILE_MAX_SIZE = 20 * 1024 * 1024;
+        try {
+            board[e.target.name] = e.target.files;
+            setBoard({ ...board });
+            const files = board.newFiles;
+            const fileList = Array.from(files);
+            for (let i = 0; i < fileList.length; i++) {
+                if (fileList[i].size > FILE_MAX_SIZE) {
+                    throw new Error(
+                        `파일 크기가 너무 큽니다. 최대 크기: ${FILE_MAX_SIZE / (1024 * 1024)}MB`
+                    );
+                }
+            }
+            setFileStore((fileStore) => [...fileStore, ...Array.from(files)]);
+        } catch (err) {
+            setFileError(err.message);
+            setOpen(true);
+        }
+    };
+
+    const handleClickClose = () => {
+        setOpen(false);
+        setFileError(null);
+    };
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
@@ -246,12 +304,11 @@ const ModifyComponent = () => {
 
             <Demo>
                 <List >
-                    {fileStore.length > 0 ? fileStore.map((uploadFile, index) => (
+                    {savedFileStore.length > 0 ? savedFileStore.map((uploadFile, index) => (
                         <ListItem key={index}
                                   secondaryAction={
                                       <IconButton
-                                          onClick={() => handleClickFileClear(index)}
-                                          // onClick={() => handleClickDownload(uploadFileName)}
+                                          onClick={() => handleClickSavedFileClear(index)}
                                           name={uploadFile}
                                           edge="end"
                                           aria-label="download">
@@ -273,7 +330,30 @@ const ModifyComponent = () => {
                     ) : <></>
                     }
                 </List>
+
             </Demo>
+            <FileUploadComponent
+                name={"newFiles"}
+                handleChangeUploadFile={handleChangeUploadFile} />
+
+            {fileStore.length > 0
+                ? fileStore.map((uploadFile, index) => (
+                    <ListItem key={index} secondaryAction={<IconButton
+                        name={uploadFile.name}
+                        onClick={() => handleClickFileClear(index)}
+                        edge="end"
+                        aria-label="upload">
+                        <ClearIcon name={uploadFile.name} />
+                    </IconButton>}>
+                        <ListItemAvatar>
+                            <Avatar>
+                                <FolderIcon />
+                            </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={uploadFile.name} />
+                    </ListItem>
+                ))
+                : null}
             <Button
                 variant="outlined"
                 color="primary"
@@ -282,6 +362,21 @@ const ModifyComponent = () => {
             >
                 수정하기
             </Button>
+            <ModalComponent
+                title="회원 전용 기능"
+                content="회원이 아니어서 글을 작성할 수 없습니다. 로그인 해주세요:)"
+                handleClose={handleClickClose}
+                open={open}
+            />
+
+            {fileError ? (
+                <ModalComponent
+                    title="파일 에러"
+                    content={fileError}
+                    handleClose={handleClickClose}
+                    open={open}
+                />
+            ) : null}
         </div>
     );
 };

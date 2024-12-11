@@ -16,7 +16,7 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 
-export default function FileUploadComponent({handleChangeUploadFile}) {
+export default function FileUploadComponent({handleChangeUploadFile,name="files"}) {
 
   const fileInputRef = useRef(null)
 
@@ -39,7 +39,7 @@ export default function FileUploadComponent({handleChangeUploadFile}) {
         Upload files (~20MB)
         <VisuallyHiddenInput
             ref={fileInputRef}
-            name={"files"}
+            name={name}
             type="file"
             onChange={handleChangeUploadFile}
             multiple
