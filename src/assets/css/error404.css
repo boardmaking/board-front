@@ -1,0 +1,20 @@
+/* BasicLayout.css */
+.layout-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* 화면 전체를 차지 */
+  background-color: #f0f0f0; /* 배경색 (필요시 설정) */
+}
+
+.main-content {
+  background-image: url('/404.jpg');
+  background-size: cover;
+  background-position: center; /* 이미지가 div의 중앙에 위치 */
+  width: 100%; /* div의 너비 */
+  height: 100%; /* div의 높이 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px; /* 콘텐츠 여백 (필요시 설정) */
+}
