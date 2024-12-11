@@ -266,11 +266,11 @@ const WriteComponent = () => {
       toast.success('글이 작성되었습니다.');
       moveToMain();
     } catch (error) {
-      console.error('작성 실패:', error);
+      console.error('작성 실패:', error.message);
       if (error.response?.data?.ERROR === 'REQUIRED_LOGIN') {
         setOpen(true);
       }
-      if (error.response.data.statusCode === 413) {
+      if (error.response?.data?.statusCode === 413) {
         toast.error('최대 20MB 까지 업로드 가능합니다.');
       } else {
         toast.error('글 작성에 실패했습니다.');
