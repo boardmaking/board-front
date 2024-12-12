@@ -51,6 +51,7 @@ const WriteComponent = () => {
   const titleRef = useRef(null);
   const [tempImages, setTempImages] = useState(new Map());
   const [fileError, setFileError] = useState(null);
+  const{isLogin,moveToLoginReturn} =useCustomLogin()
   const [board, setBoard] = useState({
     email: '',
     title: '',
@@ -64,7 +65,10 @@ const WriteComponent = () => {
   });
   const [fileStore, setFileStore] = useState([]);
   const [open, setOpen] = useState(false);
-  const { isLogin, moveToLoginReturn } = useCustomLogin();
+
+  if (!isLogin) {
+    return moveToLoginReturn()
+  }
 
   const boardMutation = useMutation({
     mutationFn: (board) => postBoard(board),
