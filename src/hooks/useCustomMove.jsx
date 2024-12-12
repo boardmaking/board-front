@@ -33,7 +33,6 @@ const useCustomMove = () => {
 
   const moveToList = (pageParam) => {
 
-    console.log(pageParam)
     let queryStr =
         ""
     if (pageParam) {

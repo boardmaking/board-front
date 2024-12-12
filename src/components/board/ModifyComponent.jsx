@@ -70,7 +70,6 @@ const ModifyComponent = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(boardData)
       board['username'] = boardData.username
       board['boardId'] = boardData.boardId
       board['title'] = boardData.title
@@ -278,7 +277,6 @@ const ModifyComponent = () => {
   const handleChangeContent = (content) => {
     board['content'] = content
     setBoard(board)
-    console.log(board)
   }
 
   return (

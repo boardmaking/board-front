@@ -86,7 +86,6 @@ function CommentComponent() {
   };
 
   const handleClickDeleteComment = (commentId) => {
-    console.log(commentId)
     deleteParam.commentId = commentId
     deleteComment(deleteParam).then(data => {
       if (data.success){
