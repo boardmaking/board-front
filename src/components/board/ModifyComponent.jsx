@@ -210,8 +210,6 @@ const ModifyComponent = () => {
     }
 
     board.files = savedFileStore
-    console.log(board)
-    console.log(userId)
     formData.append('boardId', board.boardId)
     formData.append('email', userEmail)
     formData.append('title', board.title)
