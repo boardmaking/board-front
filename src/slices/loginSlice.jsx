@@ -27,7 +27,6 @@ const loginSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(loginPostAsync.fulfilled,(state,action)=>{
-      console.log("fulfilled")
       const payload = action.payload
       if(!payload.ERROR){
         setCookie("user",JSON.stringify(payload))
@@ -44,10 +43,8 @@ const loginSlice = createSlice({
       }
     })
     .addCase(loginPostAsync.pending,(state,action)=>{
-      console.log('pending')
     })
     .addCase(loginPostAsync.rejected,(state,action)=>{
-      console.log('rejected')
     })
   }
 })
