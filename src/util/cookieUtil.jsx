@@ -2,9 +2,9 @@ import {Cookies} from "react-cookie";
 
 const cookies = new Cookies()
 
-export const setCookie = (name, value, days = 1) => {
+export const setCookie = (name, value, hours = 1) => {
   const expires = new Date()
-  expires.setUTCDate(expires.getUTCDate() + days)
+  expires.setHours(expires.getHours() + hours)
 
   return cookies.set(name, value, {expires: expires, path: '/'})
 }
