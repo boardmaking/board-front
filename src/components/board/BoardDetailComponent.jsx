@@ -24,6 +24,7 @@ import ModalComponent from "../common/ModalComponent.jsx";
 import PauseIcon from '@mui/icons-material/Pause';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {useState} from "react";
+import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 
 const BoardDetailComponent = () => {
   const location = useLocation();
@@ -38,7 +39,11 @@ const BoardDetailComponent = () => {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState({})
   const [hasDownloaded, setHasDownloaded] = useState({})
+  const{isLogin,moveToLoginReturn} =useCustomLogin()
   const userInfo = getCookie('user');
+  if (!isLogin) {
+    return moveToLoginReturn()
+  }
 
   const boardMutation = useMutation({
     mutationFn: postDeleteBoard,

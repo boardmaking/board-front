@@ -54,9 +54,11 @@ const ModifyComponent = () => {
   const [fileError, setFileError] = useState(null);
   const [open, setOpen] = useState(false)
   const [board, setBoard] = useState(initState);
-  const{loginState} = useCustomLogin()
+  const{loginState,isLogin,moveToLoginReturn} = useCustomLogin()
   const userEmail = loginState.email
   const userId = loginState.id
+
+
 
   const {data: boardData, isSuccess} = useQuery({
     queryKey: ['board', boardId],
@@ -82,6 +84,9 @@ const ModifyComponent = () => {
   }, [boardId,boardData,isSuccess]);
 
 
+  if (!isLogin) {
+    return moveToLoginReturn()
+  }
 
   const handleClassificationChange = (event) => {
     setBoard(prev => ({
