@@ -33,7 +33,7 @@ const BoardDetailComponent = () => {
     title = "제목이 없습니다.",
     content = "내용이 없습니다.",
     username = "정보 없음",
-    createAt = "정보 없음"
+    createdAt = "정보 없음"
   } = location.state || {};
   const {id: boardId} = useParams();
   const [open, setOpen] = useState(false)
@@ -131,7 +131,7 @@ const BoardDetailComponent = () => {
             marginBottom: 2
           }}>
             <span>작성자: {username}</span>
-            <span>작성일: {createAt}</span>
+            <span>작성일: {createdAt}</span>
           </Box>
           <Divider sx={{margin: '20px 0'}}/>
           <Box
