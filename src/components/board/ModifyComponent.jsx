@@ -33,14 +33,26 @@ const formats = [
   'color', 'background', 'size', 'h1', 'image'
 ];
 
-const initState = {
-  username:'',
+/*const initState = {
+  username: '',
   boardId: '',
-  title:'',
-  content:'',
-  classification:'',
-  createAt:'',
-  files:[],
+  title: '',
+  content: '',
+  classification: '',
+  createAt: '',
+  files: [],
+  newFiles: []
+}*/
+const initState = {
+  username: '',
+  boardId: '',
+  title: '',
+  content: '',
+  uploadFileNameList: [],
+  originalFileNameList: [],
+  createdAt: '',
+  classification: '',
+  files: [],
   newFiles:[]
 }
 
@@ -54,11 +66,9 @@ const ModifyComponent = () => {
   const [fileError, setFileError] = useState(null);
   const [open, setOpen] = useState(false)
   const [board, setBoard] = useState(initState);
-  const{loginState,isLogin,moveToLoginReturn} = useCustomLogin()
+  const {loginState, isLogin, moveToLoginReturn} = useCustomLogin()
   const userEmail = loginState.email
-  const userId = loginState.id
-
-
+  const userId = loginState.userId
 
   const {data: boardData, isSuccess} = useQuery({
     queryKey: ['board', boardId],
@@ -72,6 +82,7 @@ const ModifyComponent = () => {
 
   useEffect(() => {
     if (isSuccess) {
+
       board['username'] = boardData.username
       board['boardId'] = boardData.boardId
       board['title'] = boardData.title
@@ -79,32 +90,14 @@ const ModifyComponent = () => {
       board['classification'] = boardData.classification
       board['originalFileNameList'] = boardData.originalFileNameList
       board['uploadFileNameList'] = boardData.uploadFileNameList
-      setBoard(board)
+      setBoard(boardData)
     }
-  }, [boardId,boardData,isSuccess]);
+  }, [boardId,boardData]);
 
-
-  if (!isLogin) {
-    return moveToLoginReturn()
-  }
-
-  const handleClassificationChange = (event) => {
-    setBoard(prev => ({
-      ...prev,
-      classification: event.target.value
-    }));
-  };
 
   const boardMutation = useMutation({
     mutationFn: (board) => postModify(board)
   });
-
-  const handleTitleChange = (event) => {
-    setBoard(prev => ({
-      ...prev,
-      title: event.target.value
-    }));
-  };
 
   const imageHandler = () => {
     const input = document.createElement('input');
@@ -129,6 +122,12 @@ const ModifyComponent = () => {
     };
   };
 
+  const handleChange = (e) => {
+    board[e.target.name] = e.target.value
+    setBoard({...board})
+    console.log(board)
+  }
+
   const modules = useMemo(() => ({
     toolbar: {
       container: [
@@ -144,6 +143,10 @@ const ModifyComponent = () => {
       },
     },
   }), []);
+
+  if (!isLogin) {
+    return moveToLoginReturn()
+  }
 
   const handleClickUpdate = async () => {
     if (!board.title.trim()) {
@@ -214,6 +217,9 @@ const ModifyComponent = () => {
     }
 
     board.files = savedFileStore
+    console.log(`userId ${userId}`)
+    console.log(loginState)
+    console.log(board)
     formData.append('boardId', board.boardId)
     formData.append('email', userEmail)
     formData.append('title', board.title)
@@ -257,7 +263,7 @@ const ModifyComponent = () => {
     const FILE_MAX_SIZE = 20 * 1024 * 1024;
     try {
       board[e.target.name] = e.target.files;
-      setBoard({...board});
+      // setBoard({...board});
       const files = board.newFiles;
       const fileList = Array.from(files);
       for (let i = 0; i < fileList.length; i++) {
@@ -289,6 +295,7 @@ const ModifyComponent = () => {
         <TextFieldComponent
             label="작성자"
             value={board.username}
+            name={'writer'}
             InputProps={{
               readOnly: true,
             }}
@@ -301,17 +308,18 @@ const ModifyComponent = () => {
             style={{marginTop: 10}}
             label="제목"
             value={board.title}
-            onChange={handleTitleChange}
+            name={'title'}
+            onChange={handleChange}
             variant="outlined"
             fullWidth
             required
             placeholder="제목을 입력해주세요"
             autoFocus
-        />
+        >{board.title}</TextField>
 
         <ClassificationComponent
             value={board.classification}
-            onChange={handleClassificationChange}
+            onChange={handleChange}
         />
 
         <div style={{height: '500px', border: '1px solid #ccc', marginTop: 10}}>
@@ -320,6 +328,7 @@ const ModifyComponent = () => {
               theme="snow"
               modules={modules}
               formats={formats}
+              name={'content'}
               value={board.content}
               onChange={handleChangeContent}
               style={{height: '100%'}}

@@ -52,7 +52,7 @@ function CommentComponent() {
     queryFn: () => getBoard(boardId.toString()),
   });
 
-  const {data: commentList = []} = useQuery({
+  const {data: commentList = [],isError,error} = useQuery({
     queryKey: ['comments', boardId, refresh],
     queryFn: () => getList(boardId.toString()),
   });
