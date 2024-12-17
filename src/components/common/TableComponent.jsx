@@ -86,8 +86,10 @@ export default function TableComponent() {
 
     const {moveToWrite} = useCustomMove()
 
+
     useEffect(() => {
         if (data?.data) {
+
             setTotalItems(data.data.length);
         }
     }, [data]);

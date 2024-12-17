@@ -3,7 +3,7 @@ import {BOARD, IMAGE} from "./config.js";
 import jwtAxios from "../util/jwtUtil.jsx";
 
 export const getList = async (param) => {
-  return (await axios.get(`${BOARD}/list`, {
+  return (await jwtAxios.get(`${BOARD}/list`, {
     params: {
       category: param.category,
       search: param.search
