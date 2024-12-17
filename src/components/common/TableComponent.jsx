@@ -35,7 +35,7 @@ const columns = [
     {id: 'classification', label: '구분', minWidth: 100},
     {id: 'title', label: '제목', minWidth: 300},
     {id: 'username', label: '작성자', minWidth: 120, align: 'center'},
-    {id: 'createAt', label: '작성일', minWidth: 120, align: 'center'},
+    {id: 'createdAt', label: '작성일', minWidth: 120, align: 'center'},
 ];
 
 const categoryConfig = {
@@ -131,10 +131,10 @@ export default function TableComponent() {
         return data.data.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
     };
 
-    const handleClickRow = (seq, boardId, title, username, createAt, content) => {
+    const handleClickRow = (seq, boardId, title, username, createdAt, content) => {
         navigate(`/boards/read/${boardId}`, {
             state: {
-                title, createAt, username, content
+                title, createdAt, username, content
             }
         });
     };
@@ -189,7 +189,7 @@ export default function TableComponent() {
                                     role="checkbox"
                                     tabIndex={-1}
                                     key={row.boardId}
-                                    onClick={() => handleClickRow(row.id, row.boardId, row.title, row.username, row.createAt, row.content)}
+                                    onClick={() => handleClickRow(row.id, row.boardId, row.title, row.username, row.createdAt, row.content)}
                                     sx={{
                                         cursor: 'pointer',
                                         '&:hover': {
@@ -233,7 +233,7 @@ export default function TableComponent() {
                                         <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1}}>
                                             <AccessTimeIcon sx={{fontSize: 16, color: '#757575'}}/>
                                             <Typography variant="body2" sx={{color: '#666'}}>
-                                                {formatDate(row.createAt)}
+                                                {formatDate(row.createdAt)}
                                             </Typography>
                                         </Box>
                                     </TableCell>
