@@ -68,7 +68,7 @@ const ModifyComponent = () => {
   const [board, setBoard] = useState(initState);
   const {loginState, isLogin, moveToLoginReturn} = useCustomLogin()
   const userEmail = loginState.email
-  const userId = loginState.userId
+  const userId = loginState.id
 
   const {data: boardData, isSuccess} = useQuery({
     queryKey: ['board', boardId],
@@ -82,7 +82,7 @@ const ModifyComponent = () => {
 
   useEffect(() => {
     if (isSuccess) {
-
+      console.log(boardData)
       board['username'] = boardData.username
       board['boardId'] = boardData.boardId
       board['title'] = boardData.title
@@ -91,6 +91,7 @@ const ModifyComponent = () => {
       board['originalFileNameList'] = boardData.originalFileNameList
       board['uploadFileNameList'] = boardData.uploadFileNameList
       setBoard(boardData)
+      setSavedFileStore(boardData.uploadFileNameList)
     }
   }, [boardId,boardData]);
 
