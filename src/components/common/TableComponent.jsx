@@ -78,7 +78,6 @@ export default function TableComponent() {
     const {category, search, refresh} = useCustomMove();
     const [totalItems, setTotalItems] = useState(0);
     const {encodedEncryptedData} = encryptUtil(search,category)
-    console.log(encodedEncryptedData)
     const {data} = useQuery({
         queryKey: ['boardList', {category, search, refresh}],
         queryFn: () => getList({category, search}),

@@ -82,7 +82,6 @@ const ModifyComponent = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log(boardData)
       board['username'] = boardData.username
       board['boardId'] = boardData.boardId
       board['title'] = boardData.title
@@ -126,7 +125,6 @@ const ModifyComponent = () => {
   const handleChange = (e) => {
     board[e.target.name] = e.target.value
     setBoard({...board})
-    console.log(board)
   }
 
   const modules = useMemo(() => ({
@@ -218,9 +216,6 @@ const ModifyComponent = () => {
     }
 
     board.files = savedFileStore
-    console.log(`userId ${userId}`)
-    console.log(loginState)
-    console.log(board)
     formData.append('boardId', board.boardId)
     formData.append('email', userEmail)
     formData.append('title', board.title)
