@@ -58,31 +58,20 @@ function LoginComponent() {
       name: googleInfo.name
     }
     googleLogin(googleUserInfo).then(data => {
-      console.log(data)
       doLogin({email:data.email
       ,password: data.username
+      }).then(data=>{
+        if (data.error) {
+          setFail(true)
+        } else {
+          setSuccess(true)
+          setResult(data.username)
+        }
       })
     }).catch(err => {
       console.log(err)
     })
-    /*try {
-      // 백엔드 서버로 ID 토큰 전송
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(idToken)
-      });
 
-      if (!res.ok) {
-        throw new Error('Failed to authenticate');
-      }
-
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Error during login:', error);
-    }*/
   }
 
   const handleGoogleLoginFailure = (error) => {
