@@ -16,10 +16,10 @@ const loginSlice = createSlice({
   name: 'loginSlice',
   initialState: loadMemberCookie() || initState,
   reducers: {
-    /*login: (state, action) => {
+    login: (state, action) => {
       console.log(`로그인 슬라이스 ${action.payload}`)
       return {email: action.payload.email}
-    },*/
+    },
     logout: () => {
       removeCookie('user')
       return {...initState}
