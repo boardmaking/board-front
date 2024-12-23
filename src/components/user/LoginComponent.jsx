@@ -10,11 +10,16 @@ import Typography from "@mui/material/Typography";
 import {GoogleLogin, GoogleOAuthProvider} from "@react-oauth/google";
 import {googleLogin} from "../../api/oauth2Api.js";
 import {jwtDecode} from "jwt-decode";
+import {Link} from "react-router-dom";
+import {getNaverLoginLink} from "../../api/naverApi.js";
+
 
 const initState = {
   email: '',
   password: ''
 }
+
+const link = getNaverLoginLink()
 
 function LoginComponent() {
 
@@ -176,6 +181,14 @@ function LoginComponent() {
                   onFailure={handleGoogleLoginFailure}
               />
             </GoogleOAuthProvider>
+            <div>
+              <Link to={link}>
+                <img src="/src/assets/images/naver_login.png"
+                     alt="Naver Login"
+                     style={{ width: '200px', height: 'auto', marginTop: '20px', marginBottom: '20px' }}
+                />
+              </Link>
+            </div>
           </Box>
         </Paper>
       </Container>
