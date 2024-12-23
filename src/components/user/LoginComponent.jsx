@@ -183,7 +183,7 @@ function LoginComponent() {
             </GoogleOAuthProvider>
             <div>
               <Link to={link}>
-                <img src="/src/assets/images/naver_login.png"
+                <img src="/naver_login.png"
                      alt="Naver Login"
                      style={{ width: '200px', height: 'auto', marginTop: '20px', marginBottom: '20px' }}
                 />
