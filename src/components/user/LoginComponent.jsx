@@ -12,6 +12,7 @@ import {googleLogin} from "../../api/oauth2Api.js";
 import {jwtDecode} from "jwt-decode";
 import {Link} from "react-router-dom";
 import {getNaverLoginLink} from "../../api/naverApi.js";
+import {getKakaoLoginLink} from "../../api/kakaoApi.js";
 
 
 const initState = {
@@ -19,7 +20,8 @@ const initState = {
   password: ''
 }
 
-const link = getNaverLoginLink()
+const naverLink = getNaverLoginLink()
+const kakaoLink = getKakaoLoginLink()
 
 function LoginComponent() {
 
@@ -182,10 +184,18 @@ function LoginComponent() {
               />
             </GoogleOAuthProvider>
             <div>
-              <Link to={link}>
+              <Link to={naverLink}>
                 <img src="/naver_login.png"
                      alt="Naver Login"
-                     style={{ width: '200px', height: 'auto', marginTop: '20px', marginBottom: '20px' }}
+                     style={{ width: '200px', height: 'auto', marginTop: '20px' }}
+                />
+              </Link>
+            </div>
+            <div>
+              <Link to={kakaoLink}>
+                <img src="/kakao_login.png"
+                     alt="Kakao Login"
+                     style={{ width: '200px', height: 'auto', marginTop: '20px' }}
                 />
               </Link>
             </div>
