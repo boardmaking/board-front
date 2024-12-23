@@ -2,7 +2,7 @@ import axios from "axios";
 import {API_SERVER_HOST} from "./config.js";
 
 const naver_client_id = import.meta.env.VITE_OAUTH2_NAVER_CLIENT_ID
-const naver_redirect_url = 'http://localhost:5173/users/naver'
+const naver_redirect_url = import.meta.env.VITE_NAVER_REDIRECT_URI
 
 export const getNaverLoginLink = () => {
   return `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${naver_client_id}&state=STATE_STRING&redirect_uri=${naver_redirect_url}`
