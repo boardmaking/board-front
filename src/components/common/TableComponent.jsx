@@ -79,8 +79,8 @@ export default function TableComponent() {
     const [totalItems, setTotalItems] = useState(0);
     const {encodedEncryptedData} = encryptUtil(search,category)
     const {data} = useQuery({
-        queryKey: ['boardList', {category, search, refresh}],
-        queryFn: () => getList({category, search}),
+        queryKey: ['boardList', {category, search, refresh,page,rowsPerPage}],
+        queryFn: () => getList({category, search,page:page,size:rowsPerPage}),
     });
 
     const {moveToWrite} = useCustomMove()
@@ -88,8 +88,10 @@ export default function TableComponent() {
 
     useEffect(() => {
         if (data?.data) {
+            setPage(data.data.number)
+            setRowsPerPage(data.data.size)
+            setTotalItems(data.data.totalElements)
 
-            setTotalItems(data.data.length);
         }
     }, [data]);
 
@@ -98,7 +100,7 @@ export default function TableComponent() {
     };
 
     const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
+        setRowsPerPage(+event.target.value)
         setPage(0);
     };
 
@@ -127,7 +129,7 @@ export default function TableComponent() {
 
     const getCurrentPageData = () => {
         if (!data?.data) return [];
-        return data.data.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
+        return data.data.content;
     };
 
     const handleClickRow = (seq, boardId, title, username, createdAt, content) => {

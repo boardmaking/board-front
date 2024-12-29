@@ -6,7 +6,9 @@ export const getList = async (param) => {
   return (await jwtAxios.get(`${BOARD}/list`, {
     params: {
       category: param.category,
-      search: param.search
+      search: param.search,
+      page: param.page,
+      size: param.size
     }
   })).data
 }
