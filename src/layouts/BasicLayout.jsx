@@ -1,101 +1,17 @@
-import {alpha, styled} from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
-import HomeIcon from '@mui/icons-material/Home';
-import SearchIcon from '@mui/icons-material/Search';
-import {Button, InputLabel, Select} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import useCustomMove from "../hooks/useCustomMove.jsx";
 import {useLocation} from "react-router-dom";
 import useCustomLogin from "../hooks/useCustomLogin.jsx";
-
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  width: '100%',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    [theme.breakpoints.up('sm')]: {
-      width: '14ch',
-      '&:focus': {
-        width: '22ch',
-      },
-    },
-  },
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  margin: theme.spacing(1),
-  color: theme.palette.primary.main,
-  borderColor: theme.palette.primary.main,
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-  },
-}));
-
-const StyledSelect = styled(Select)(({ theme }) => ({
-  backgroundColor: 'white',
-  opacity: 0.9,
-  color: 'black',
-  marginRight: theme.spacing(2),
-  minWidth: 120,
-  '& .MuiSelect-select': {
-    padding: theme.spacing(1),
-  },
-}));
-
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: '#1976d2',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-}));
 
 const initState = {
   category: '1',
   search: ''
 }
 
-const UserInfoTypography = styled(Typography)(({ theme }) => ({
-  marginRight: theme.spacing(2),
-  color: theme.palette.primary.main,
-  display: 'flex',
-  alignItems: 'center',
-  fontWeight: 500
-}));
-
-export default function BasicLayout({ children }) {
+export default function BasicLayout({children}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [search, setSearch] = useState(initState);
-  const { moveToList, moveToMain, moveToPath } = useCustomMove();
+  const {moveToList, moveToMain, moveToPath} = useCustomMove();
   const {doLogout, isAdmin} = useCustomLogin();
   const [userInfo, setUserInfo] = useState(null);
   const location = useLocation();
@@ -103,8 +19,8 @@ export default function BasicLayout({ children }) {
 
   useEffect(() => {
     const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('user='));
+    .split('; ')
+    .find(row => row.startsWith('user='));
 
     if (cookieValue) {
       const user = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
@@ -143,89 +59,66 @@ export default function BasicLayout({ children }) {
   }
 
   return (
-      <Box sx={{ flexGrow: 1, minHeight: '100vh' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: 1, gap: 1 }}>
-          {isLoggedIn && userInfo ? (
-              <>
-                <UserInfoTypography variant="subtitle1">
-                  {userInfo.username}님 환영합니다
-                </UserInfoTypography>
-                {isAdmin() && pathname !== '/users/join' ?<StyledButton variant="outlined" onClick={handleClickJoin}>
-                  회원가입하러 가기
-                </StyledButton> :<></>
+      <>
+        <header className="w-full px-6 bg-white">
+          <div
+              className="container mx-auto max-w-4xl md:flex justify-between items-center">
+            <a href="#"
+               className="block py-6 w-full text-center md:text-left md:w-auto text-gray-600 no-underline flex justify-center items-center">
+              Consent Team
+            </a>
+            <div
+                className="w-full md:w-auto mb-6 md:mb-0 text-center md:text-right">
+              <a href="#"
+                 className="inline-block no-underline bg-black text-white text-sm py-2 px-3">Sign
+                Up</a>
+            </div>
+          </div>
+        </header>
+        <nav
+            className="w-full bg-white md:pt-0 px-6 shadow-lg relative z-20 border-t border-b border-gray-400">
+          <div
+              className="container mx-auto max-w-4xl md:flex justify-between items-center text-sm md:text-md md:justify-start">
+            <div
+                className="w-full md:w-1/2 text-center md:text-left py-4 flex flex-wrap justify-center items-stretch md:justify-start md:items-start">
+              <a href="#"
+                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">Home</a>
+              <a href="#"
+                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">Posting</a>
+              <a href="#"
+                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">About
+                Us</a>
+              <a href="#"
+                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">News</a>
+              <a href="#"
+                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline">Contact</a>
+            </div>
+            <div
+                className="w-full md:w-1/2 text-center md:text-right pb-4 md:p-0">
+              <input type="search" placeholder="Search..."
+                     className="bg-gray-300 border text-sm p-1"/>
+            </div>
+          </div>
+        </nav>
+        {/*<div
+            className="w-full py-24 px-6 bg-cover bg-no-repeat bg-center relative z-10"
+            style={{
+              backgroundImage: "url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=2100')"
+            }}
+        >
+          <div className="container max-w-4xl mx-auto text-center">
+            <h1 className="text-xl leading-tight md:text-3xl text-center text-gray-100 mb-3">Lorem
+              ipsum dolor sit amet</h1>
+            <p className="text-md md:text-lg text-center text-white ">Ut enim ad
+              minim veniam, quis nostrud exercitation</p>
 
-                }
-                <StyledButton variant="outlined" onClick={handleClickLogout}>
-                  로그아웃
-                </StyledButton>
-              </>
-          ) : (
-              <>
-                {pathname !== '/users/login' && (
-                    <StyledButton variant="outlined" onClick={handleClickLogin}>
-                      로그인하러 가기
-                    </StyledButton>
-                )}
-              </>
-          )}
+            <a href="/register"
+               className="mt-6 inline-block bg-white text-black no-underline px-4 py-3 shadow-lg">Find
+              out more</a>
+          </div>
 
-
-        </Box>
-        <StyledAppBar position="static" sx={{ borderRadius: '2px' }}>
-          <Toolbar>
-            <IconButton
-                size="large"
-                edge="start"
-                color="inherit"
-                onClick={moveToMain}
-                aria-label="open drawer"
-                sx={{ mr: 2, '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' } }}
-            >
-              <HomeIcon />
-            </IconButton>
-            <Typography
-                variant="h6"
-                noWrap
-                component="div"
-                sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' }, fontWeight: 600, letterSpacing: '0.5px' }}
-            >
-              이슈 게시판
-            </Typography>
-            <InputLabel
-                htmlFor="grouped-native-select"
-                sx={{ color: 'white', marginRight: 1, fontSize: '0.9rem' }}
-            >
-              조건
-            </InputLabel>
-            <StyledSelect
-                native
-                defaultValue="1"
-                id="grouped-native-select"
-                label="category"
-                name="category"
-                onChange={handleChangeSearch}
-            >
-              <option value={1}>작성자</option>
-              <option value={2}>제목</option>
-              <option value={3}>내용</option>
-            </StyledSelect>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                  name="search"
-                  onChange={handleChangeSearch}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Search…"
-                  inputProps={{ 'aria-label': 'search' }}
-              />
-            </Search>
-          </Toolbar>
-        </StyledAppBar>
-        <Box sx={{ padding: 3 }}>
-          {children}
-        </Box>
-      </Box>
-  );
+        </div>*/}
+        {children}
+      </>
+  )
 }
