@@ -3,7 +3,7 @@ import {BOARD, IMAGE} from "./config.js";
 import jwtAxios from "../util/jwtUtil.jsx";
 
 export const getList = async (param) => {
-  return (await jwtAxios.get(`${BOARD}/list`, {
+  return (await jwtAxios.get(`${BOARD}`, {
     params: {
       category: param.category,
       search: param.search,
@@ -18,15 +18,15 @@ export const postBoard = async (params) => {
 }
 
 export const getBoard = async (boardId) => {
-  return (await axios.get(`${BOARD}/${boardId}`)).data
+  return (await jwtAxios.get(`${BOARD}/${boardId}`)).data
 }
 
 export const postDeleteBoard = async (params) => {
-  return (await jwtAxios.post(`${BOARD}/delete`, params)).data
+  return (await jwtAxios.delete(`${BOARD}`, {data:params})).data
 }
 
 export const postModify = async (params) => {
-  return (await jwtAxios.post(`${BOARD}/modify`, params)).data
+  return (await jwtAxios.put(`${BOARD}`, params)).data
 }
 
 export const uploadImage = async (params) => {
