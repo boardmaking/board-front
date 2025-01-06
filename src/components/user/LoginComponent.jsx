@@ -14,7 +14,6 @@ import {Link} from "react-router-dom";
 import {getNaverLoginLink} from "../../api/naverApi.js";
 import {getKakaoLoginLink} from "../../api/kakaoApi.js";
 
-
 const initState = {
   email: '',
   password: ''
@@ -65,9 +64,10 @@ function LoginComponent() {
       name: googleInfo.name
     }
     googleLogin(googleUserInfo).then(data => {
-      doLogin({email:data.email
-      ,password: data.username
-      }).then(data=>{
+      doLogin({
+        email: data.email
+        , password: data.username
+      }).then(data => {
         if (data.error) {
           setFail(true)
         } else {
@@ -96,112 +96,71 @@ function LoginComponent() {
   }
 
   return (
-      <Container component="main" maxWidth="xs">
-        {result ? <ModalComponent
-                open={success}
-                title={`안녕하세요 ${result}, 님`}
-                content={"로그인 하셨습니다."}
-                handleClose={handleClose}
-            />
-            :
-            <></>}
-        {fail ? <ModalComponent
-            open={fail}
-            title={`로그인 실패`}
-            content={'아이디와 비밀번호를 다시 확인해주세요'}
-            handleClose={handleClose}
-        /> : <></>}
+      <>
+        <div className="bg-gray-100">
 
-        <Paper
-            elevation={3}
-            sx={{
-              marginTop: 8,
-              padding: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-        >
-          <Avatar sx={{
-            margin: 1,
-            backgroundColor: 'secondary.main',
-            width: 56,
-            height: 56
-          }}>
-            <LockOutlinedIcon fontSize="large"/>
-          </Avatar>
+          <div
+              className="min-h-screen w-full p-6 flex justify-center items-center">
 
-          <Typography component="h1" variant="h5" sx={{marginBottom: 3}}>
-            로그인
-          </Typography>
+            <div className="w-full max-w-xs">
 
-          <Box
-              component="form"
-              sx={{
-                width: '100%',
-                marginTop: 1,
-                '& .MuiTextField-root': {marginBottom: 2},
-              }}
-          >
-            <TextFieldComponent
-                id={'email'}
-                name={'email'}
-                type={'email'}
-                label={'이메일'}
-                value={user.email}
-                handleChange={handleChange}
-                fullWidth
-            />
-            <TextFieldComponent
-                auto={false}
-                id={'password'}
-                name={'password'}
-                type={'password'}
-                label={'비밀번호'}
-                value={user.password}
-                handleChange={handleChange}
-                fullWidth
-            />
+              <div className="bg-white border p-8 shadow rounded w-full mb-6">
 
-            <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                onClick={handleLogin}
-                sx={{
-                  marginTop: 3,
-                  marginBottom: 2,
-                  padding: 1.5,
-                  fontSize: '1.1rem'
-                }}
-            >
-              로그인
-            </Button>
-            <GoogleOAuthProvider clientId={clientId}>
-              <GoogleLogin
-                  onSuccess={handleGoogleLoginSuccess}
-                  onFailure={handleGoogleLoginFailure}
-              />
-            </GoogleOAuthProvider>
-            <div>
-              <Link to={naverLink}>
-                <img src="/naver_login.png"
-                     alt="Naver Login"
-                     style={{ width: '200px', height: 'auto', marginTop: '20px' }}
-                />
-              </Link>
+                <h1 className="mb-6 text-lg text-gray-900 font-thin">
+                  Login to your account
+                </h1>
+
+
+                  <fieldset className="mb-4">
+                    <label className="block text-sm text-gray-900 mb-2">Email
+                      address</label>
+                    <input id="email" type="email"
+                           className="block w-full rounded-sm border bg-white py-2 px-3 text-sm"
+                           name="email" required autoFocus/>
+                  </fieldset>
+
+                  <fieldset className="mb-4">
+                    <div className="w-full flex justify-between items-center">
+                      <label htmlFor="password"
+                             className="block text-sm text-gray-900 mb-2">Password</label>
+                      <a className="text-xs font-thin text-blue no-underline hover:underline"
+                         href="#">
+                        Forgotten password?
+                      </a>
+                    </div>
+                    <input id="password" type="password"
+                           className="block w-full rounded-sm border bg-white py-2 px-3 text-sm"
+                           name="password" required/>
+                  </fieldset>
+
+                  <div className="pt-1 pb-5 text-sm text-gray-darker font-thin">
+                    <label><input className="mr-1" type="checkbox"
+                                  name="remember"
+                                  id="remember"/> Remember me</label>
+                  </div>
+
+
+                  <button type="submit"
+                          className="block w-full
+                          bg-blue-600
+                          text-white
+                          rounded-sm py-3 text-sm tracking-wide">
+                    Sign in
+                  </button>
+              </div>
+
+              <p className="text-center text-sm text-gray-600 font-thin">Don't
+                have
+                an account yet? <a href="/register"
+                                   className="text-blue-500 no-underline hover:underline">Sign
+                  up</a></p>
             </div>
-            <div>
-              <Link to={kakaoLink}>
-                <img src="/kakao_login.png"
-                     alt="Kakao Login"
-                     style={{ width: '200px', height: 'auto', marginTop: '20px' }}
-                />
-              </Link>
-            </div>
-          </Box>
-        </Paper>
-      </Container>
+
+          </div>
+
+
+        </div>
+      </>
   );
 }
 
