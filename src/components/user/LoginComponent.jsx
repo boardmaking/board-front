@@ -2,10 +2,7 @@ import {useState} from 'react';
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import ModalComponent from "../common/ModalComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
-import {googleLogin} from "../../api/oauth2Api.js";
-import {jwtDecode} from "jwt-decode";
 import {Link} from "react-router-dom";
-import {getNaverLoginLink} from "../../api/naverApi.js";
 import {getKakaoLoginLink} from "../../api/kakaoApi.js";
 
 const initState = {
@@ -13,7 +10,6 @@ const initState = {
   password: ''
 }
 
-const naverLink = getNaverLoginLink()
 const kakaoLink = getKakaoLoginLink()
 
 function LoginComponent() {
@@ -33,7 +29,7 @@ function LoginComponent() {
     }));
   }
 
-  const handleLogin = (e) => {
+  const handleLogin = () => {
 
     doLogin(user)
     .then(data => {
@@ -50,36 +46,12 @@ function LoginComponent() {
     })
   }
 
-  const clientId = import.meta.env.VITE_OAUTH2_GOOGLE_CLIENT_ID
-  const handleGoogleLoginSuccess = async (data) => {
-    const idToken = data.credential;
-    const googleInfo = jwtDecode(idToken)
-    const googleUserInfo = {
-      sub: googleInfo.sub,
-      email: googleInfo.email,
-      name: googleInfo.name
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleLogin();
     }
-    googleLogin(googleUserInfo).then(data => {
-      doLogin({
-        email: data.email
-        , password: data.username
-      }).then(data => {
-        if (data.error) {
-          setFail(true)
-        } else {
-          setSuccess(true)
-          setResult(data.username)
-        }
-      })
-    }).catch(err => {
-      console.log(err)
-    })
-
   }
 
-  const handleGoogleLoginFailure = (error) => {
-    console.log(error)
-  }
 
   const handleClose = () => {
     if (result) {
@@ -114,6 +86,7 @@ function LoginComponent() {
                          type="email"
                          value={user.email}
                          onChange={handleChangeInput}
+                         onKeyDown={handleKeyDown}
                          className="block w-full rounded-sm border bg-white py-2 px-3 text-sm"
                          name="email" required autoFocus/>
                 </fieldset>
@@ -131,7 +104,7 @@ function LoginComponent() {
                          type="password"
                          value={user.password}
                          onChange={handleChangeInput}
-
+                         onKeyDown={handleKeyDown}
                          className="block w-full rounded-sm border bg-white py-2 px-3 text-sm"
                          name="password" required/>
                 </fieldset>

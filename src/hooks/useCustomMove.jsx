@@ -26,26 +26,29 @@ const useCustomMove = () => {
   const [refresh, setRefresh] = useState(false)
 
   const [queryParams] = useSearchParams()
-  const category = getNum(queryParams.get('category'), '')
-  const search = getString(queryParams.get('search'), '')
+  const searchSort = getString(queryParams.get('searchSort'), '')
+  const searchKeyword = getString(queryParams.get('searchKeyword'), '')
+  const page = getNum(queryParams.get('page'),0)
+  const size = getNum(queryParams.get('size'),12)
 
-  const queryDefault = createSearchParams({category,search}).toString()
+  const queryDefault = createSearchParams({searchSort,searchKeyword,page,size}).toString()
 
   const moveToList = (pageParam) => {
-
     let queryStr =
         ""
     if (pageParam) {
-      const category = getNum(pageParam.category, 1)
-      const search = getString(pageParam.search, '')
-      queryStr = createSearchParams({category,search}).toString()
+      const searchSort = getString(pageParam.searchSort, '')
+      const searchKeyword = getString(pageParam.searchKeyword, '')
+      const page = getNum(pageParam.page,0)
+      const size = getNum(pageParam.size,12)
+      queryStr = createSearchParams({searchSort,searchKeyword,page,size}).toString()
     } else {
       queryStr = queryDefault
     }
 
     setRefresh(!refresh)
 
-    navigate({pathname: `../`, search: queryStr})
+    navigate({pathname: `/boards/list`, search: queryStr})
   }
 
   const moveToMain = () => {
@@ -81,7 +84,7 @@ const useCustomMove = () => {
       pathname: '../read',
              })
   }
-  return {moveToList, moveToWrite, moveToMain, moveToModify, moveToRead, moveToPath,refresh, category,search}
+  return {moveToList, moveToWrite, moveToMain, moveToModify, moveToRead, moveToPath,refresh, searchSort,searchKeyword,page,size}
 }
 
 export default useCustomMove
