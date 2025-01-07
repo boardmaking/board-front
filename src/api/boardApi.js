@@ -1,12 +1,11 @@
-import axios from "axios";
 import {BOARD, IMAGE} from "./config.js";
 import jwtAxios from "../util/jwtUtil.jsx";
 
 export const getList = async (param) => {
   return (await jwtAxios.get(`${BOARD}`, {
     params: {
-      category: param.category,
-      search: param.search,
+      searchSort: param.searchSort,
+      searchKeyword: param.searchKeyword,
       page: param.page,
       size: param.size
     }

@@ -1,35 +1,42 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import useCustomMove from "../hooks/useCustomMove.jsx";
 import {Link, useLocation} from "react-router-dom";
 import useCustomLogin from "../hooks/useCustomLogin.jsx";
 
 const initState = {
-  category: '1',
-  search: ''
+  searchSort: '',
+  searchKeyword: ''
 }
 
 export default function BasicLayout({children}) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [search, setSearch] = useState(initState);
+  const [searchCondition, setSearchCondition] = useState({...initState});
   const {moveToList, moveToMain, moveToPath} = useCustomMove();
   const {doLogout, isLogin} = useCustomLogin();
-  const [userInfo, setUserInfo] = useState(null);
   const location = useLocation();
   const pathname = location.pathname;
 
-  const handleChangeSearch = (e) => {
-    search[e.target.name] = e.target.value;
-    setSearch(search);
+  const handleChangeInput = (e) => {
+    const {name, value} = e.target;
+    setSearchCondition(prevSearchCondition => ({
+      ...prevSearchCondition,
+      [name]: value
+    }))
   }
 
   const handleClickLogout = () => {
     doLogout();
-    setIsLoggedIn(false);
     moveToMain();
   }
 
   const handleClickSearch = () => {
-    moveToList(search);
+    console.log(searchCondition)
+    moveToList(searchCondition);
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleClickSearch()
+    }
   }
 
   const handleKeyPress = (event) => {
@@ -85,8 +92,12 @@ export default function BasicLayout({children}) {
                   Home
                 </Link>
               </div>
-              <a href="#"
-                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">Posting</a>
+              <div
+                  className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">
+                <Link to="/boards/list">
+                  Posting
+                </Link>
+              </div>
               <a href="#"
                  className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">About
                 Us</a>
@@ -97,30 +108,46 @@ export default function BasicLayout({children}) {
             </div>
             <div
                 className="w-full md:w-1/2 text-center md:text-right pb-4 md:p-0">
-              <input type="search" placeholder="Search..."
+              <select className="bg-gray  text-sm p-1"
+                      name="searchSort"
+              onChange={handleChangeInput}
+              >
+                <option value={""} defaultValue={null}>option</option>
+                <option
+                    value="content">content</option>
+                <option
+                    value="title">title</option>
+                <option
+                    value="writer">writer</option>
+              </select>
+              <input onChange={handleChangeInput}
+                     onKeyDown={handleKeyDown}
+                     name="searchKeyword"
+                     value={searchCondition.searchKeyword}
+                     type="search"
+                     placeholder="Search..."
                      className="bg-gray-300 border text-sm p-1"/>
             </div>
           </div>
         </nav>
-        {/*<div
-            className="w-full py-24 px-6 bg-cover bg-no-repeat bg-center relative z-10"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=2100')"
-            }}
-        >
-          <div className="container max-w-4xl mx-auto text-center">
-            <h1 className="text-xl leading-tight md:text-3xl text-center text-gray-100 mb-3">Lorem
-              ipsum dolor sit amet</h1>
-            <p className="text-md md:text-lg text-center text-white ">Ut enim ad
-              minim veniam, quis nostrud exercitation</p>
-
-            <a href="/register"
-               className="mt-6 inline-block bg-white text-black no-underline px-4 py-3 shadow-lg">Find
-              out more</a>
-          </div>
-
-        </div>*/}
         {children}
+        {/*  footer*/}
+        <footer className="w-full bg-white px-6 border-t">
+          <div
+              className="container mx-auto max-w-4xl py-6 flex flex-wrap md:flex-no-wrap justify-between items-center text-sm">
+            &copy;2024 HSB Company. All rights reserved.
+            <div className="pt-4 md:p-0 text-center md:text-right text-xs">
+              <a href="#" className="text-black no-underline hover:underline">Privacy
+                Policy</a>
+              <a href="#"
+                 className="text-black no-underline hover:underline ml-4">Terms &amp; Conditions</a>
+              <a href="#"
+                 className="text-black no-underline hover:underline ml-4">Contact
+                Us</a>
+            </div>
+          </div>
+        </footer>
+        {/*  footer*/}
       </>
   )
 }

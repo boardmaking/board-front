@@ -75,12 +75,12 @@ export default function TableComponent() {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const navigate = useNavigate();
-    const {category, search, refresh} = useCustomMove();
+    const {searchSort, searchKeyword, refresh} = useCustomMove();
     const [totalItems, setTotalItems] = useState(0);
-    const {encodedEncryptedData} = encryptUtil(search,category)
+    const {encodedEncryptedData} = encryptUtil(searchSort,searchKeyword)
     const {data} = useQuery({
-        queryKey: ['boardList', {category, search, refresh,page,rowsPerPage}],
-        queryFn: () => getList({category, search,page:page,size:rowsPerPage}),
+        queryKey: ['boardList', {searchSort, searchKeyword, refresh,page,rowsPerPage}],
+        queryFn: () => getList({searchSort, searchKeyword,page:page,size:rowsPerPage}),
     });
 
     const {moveToWrite} = useCustomMove()
