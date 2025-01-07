@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import useCustomMove from "../hooks/useCustomMove.jsx";
-import {useLocation} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import useCustomLogin from "../hooks/useCustomLogin.jsx";
 
 const initState = {
@@ -12,22 +12,10 @@ export default function BasicLayout({children}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [search, setSearch] = useState(initState);
   const {moveToList, moveToMain, moveToPath} = useCustomMove();
-  const {doLogout, isAdmin} = useCustomLogin();
+  const {doLogout, isLogin} = useCustomLogin();
   const [userInfo, setUserInfo] = useState(null);
   const location = useLocation();
   const pathname = location.pathname;
-
-  useEffect(() => {
-    const cookieValue = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('user='));
-
-    if (cookieValue) {
-      const user = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
-      setUserInfo(user);
-      setIsLoggedIn(true);
-    }
-  }, []);
 
   const handleChangeSearch = (e) => {
     search[e.target.name] = e.target.value;
@@ -63,15 +51,25 @@ export default function BasicLayout({children}) {
         <header className="w-full px-6 bg-white">
           <div
               className="container mx-auto max-w-4xl md:flex justify-between items-center">
-            <a href="#"
-               className="block py-6 w-full text-center md:text-left md:w-auto text-gray-600 no-underline flex justify-center items-center">
-              Consent Team
-            </a>
+            <div
+                className="block py-6 w-full text-center md:text-left md:w-auto text-gray-600 no-underline flex justify-center items-center">
+              <Link to={"/"}>
+                Consent Team
+              </Link>
+            </div>
             <div
                 className="w-full md:w-auto mb-6 md:mb-0 text-center md:text-right">
-              <a href="#"
-                 className="inline-block no-underline bg-black text-white text-sm py-2 px-3">Sign
-                Up</a>
+              <div
+                  className="inline-block no-underline bg-black text-white text-sm py-2 px-3">
+                {isLogin ?
+                    <div onClick={handleClickLogout}>
+                      Logout
+                    </div> :
+                    <Link to="/users/join">
+                      Sign Up
+                    </Link>
+                }
+              </div>
             </div>
           </div>
         </header>
@@ -81,8 +79,12 @@ export default function BasicLayout({children}) {
               className="container mx-auto max-w-4xl md:flex justify-between items-center text-sm md:text-md md:justify-start">
             <div
                 className="w-full md:w-1/2 text-center md:text-left py-4 flex flex-wrap justify-center items-stretch md:justify-start md:items-start">
-              <a href="#"
-                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">Home</a>
+              <div
+                  className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">
+                <Link to="/">
+                  Home
+                </Link>
+              </div>
               <a href="#"
                  className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">Posting</a>
               <a href="#"
