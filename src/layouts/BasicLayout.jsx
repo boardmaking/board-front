@@ -98,9 +98,10 @@ export default function BasicLayout({children}) {
                   Posting
                 </Link>
               </div>
-              <a href="#"
-                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">About
-                Us</a>
+              <Link to="/columns/list"
+                 className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">
+                Column
+              </Link>
               <a href="#"
                  className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">News</a>
               <a href="#"
@@ -112,13 +113,12 @@ export default function BasicLayout({children}) {
                       name="searchSort"
               onChange={handleChangeInput}
               >
-                <option value={""} defaultValue={null}>option</option>
                 <option
-                    value="content">content</option>
+                    value="CONTENT">content</option>
                 <option
-                    value="title">title</option>
+                    value="TITLE">title</option>
                 <option
-                    value="writer">writer</option>
+                    value="WRITER">writer</option>
               </select>
               <input onChange={handleChangeInput}
                      onKeyDown={handleKeyDown}
