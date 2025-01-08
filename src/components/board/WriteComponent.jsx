@@ -45,7 +45,7 @@ const formats = [
 ];
 
 const WriteComponent = () => {
-  const { moveToMain } = useCustomMove();
+  const { moveToMain ,moveToList ,page,size,searchKeyword,searchSort } = useCustomMove();
   const [values, setValues] = useState('');
   const quillRef = useRef(null);
   const titleRef = useRef(null);
@@ -268,7 +268,8 @@ const WriteComponent = () => {
 
       await boardMutation.mutateAsync(formData);
       toast.success('글이 작성되었습니다.');
-      moveToMain();
+      moveToList({
+        page,size,searchKeyword,searchSort})
     } catch (error) {
       console.error('작성 실패:', error.message);
       if (error.response?.data?.ERROR === 'REQUIRED_LOGIN') {

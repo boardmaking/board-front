@@ -26,9 +26,20 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {useState} from "react";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 
+const initState = {
+  boardId: 0,
+  username: "",
+  title:"",
+  content:"",
+  createdAt:"",
+  classifiaction:"",
+  originalFileNameList: [],
+  uploadedFileNameList:[],
+}
+
 const BoardDetailComponent = () => {
   const location = useLocation();
-  const {moveToMain, moveToModify} = useCustomMove();
+  const {moveToList,moveToMain, moveToModify,page,size,searchSort,searchKeyword} = useCustomMove();
   const {
     title = "제목이 없습니다.",
     content = "내용이 없습니다.",
@@ -49,7 +60,7 @@ const BoardDetailComponent = () => {
     mutationFn: postDeleteBoard,
     onSuccess: () => {
       toast.success("삭제되었습니다.");
-      moveToMain();
+      moveToList({page,size,searchKeyword,searchSort});
     },
     onError: () => {
       toast.error("본인만 삭제할 수 있습니다.");
@@ -60,6 +71,9 @@ const BoardDetailComponent = () => {
     queryKey: ['board', boardId],
     queryFn: () => getBoard(boardId),
   });
+
+
+  const board = data || initState
 
   const handleClickDelete = () => {
     if (!userInfo) {
@@ -77,7 +91,7 @@ const BoardDetailComponent = () => {
       toast.error("로그인 후 수정할 수 있습니다.");
       return;
     }
-    if (userInfo.username === username) {
+    if (userInfo.username === board.username) {
       moveToModify(boardId);
     } else {
       toast.error("본인만 수정할 수 있습니다.");
@@ -123,15 +137,15 @@ const BoardDetailComponent = () => {
   return (
       <Box sx={{maxWidth: '800px', margin: '0 auto', padding: '20px'}}>
         <Paper elevation={3} sx={{padding: 3, marginBottom: 3}}>
-          <h2>{title}</h2>
+          <h2>{board.title}</h2>
           <Box sx={{
             display: 'flex',
             justifyContent: 'space-between',
             color: 'text.secondary',
             marginBottom: 2
           }}>
-            <span>작성자: {username}</span>
-            <span>작성일: {createdAt}</span>
+            <span>작성자: {board.username}</span>
+            <span>작성일: {board.createdAt}</span>
           </Box>
           <Divider sx={{margin: '20px 0'}}/>
           <Box
@@ -158,12 +172,12 @@ const BoardDetailComponent = () => {
                   paddingLeft: '1em'
                 }
               }}
-              dangerouslySetInnerHTML={{__html: content}}
+              dangerouslySetInnerHTML={{__html: board.content}}
           />
           {isSuccess && data.uploadFileNameList.length !== 0 ?
               <Demo>
                 <List>
-                  {data.uploadFileNameList.map((uploadFileName, index) => (
+                  {board.uploadFileNameList.map((uploadFileName, index) => (
                       <ListItem key={index}
                                 secondaryAction={
                                   <IconButton
@@ -211,7 +225,7 @@ const BoardDetailComponent = () => {
                     color="error">삭제</Button>
           </Box>
         </Paper>
-        <CommentComponent/>
+        {/*<CommentComponent/>*/}
         <ModalComponent
             title={"회원 전용 기능"}
             content={"회원이 아니어서 파일을 다운로드할 수 없습니다. 로그인 해주세요:)"}

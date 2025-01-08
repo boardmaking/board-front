@@ -3,9 +3,10 @@ import React, {useEffect, useState} from 'react';
 
 function PageComponent({serverData, movePage}) {
 
-  const [size, setSize] = useState(12)
-  const {pageable, totalPages} = serverData
-
+  // const [size, setSize] = useState(12)
+  const size = 12;
+  const {pageable,totalPages} = serverData
+  console.log('emf')
   const offset = pageable.offset
   const currentNumber = offset === 0 ? 1 : Math.ceil((offset + 1) / size);
   let endNumber =  Math.ceil(currentNumber / size) * size;
@@ -15,19 +16,17 @@ function PageComponent({serverData, movePage}) {
 
   const pageNumberList = []
   for (let pageNumber = startNumber; pageNumber <= endNumber; pageNumber++) {
-    console.log(pageNumber);
     pageNumberList.push(pageNumber)
   }
 
   const handleChangeSize = (e) => {
     const {value} = e.target
-    setSize(value)
+    // setSize(value)
   }
 
-  useEffect(() => {
-    console.log(size)
+  /*useEffect(() => {
     movePage({size})
-  },[size])
+  },[size])*/
 
   return (
       <div
