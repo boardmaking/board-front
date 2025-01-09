@@ -52,7 +52,6 @@ function LoginComponent() {
     }
   }
 
-
   const handleClose = () => {
     if (result) {
       setResult(null)
@@ -120,11 +119,21 @@ function LoginComponent() {
                     onClick={handleLogin}
                     type="button"
                     className="block w-full
+                          mb-4
                           bg-blue-600
                           text-white
                           rounded-sm py-3 text-sm tracking-wide">
                   Sign in
                 </button>
+                <div
+                    className=" w-full flex justify-center items-center"
+                    >
+                  <Link to={getKakaoLoginLink()}>
+                  <img src="/kakao_login.png"
+                       alt="Kakao Login"
+                  />
+                  </Link>
+                </div>
               </div>
 
               <p className="text-center text-sm text-gray-600 font-thin">
