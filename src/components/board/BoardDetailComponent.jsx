@@ -19,39 +19,46 @@ import {styled} from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import FolderIcon from "@mui/icons-material/Folder";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import CommentComponent from "../comment/CommentComponent.jsx";
 import ModalComponent from "../common/ModalComponent.jsx";
 import PauseIcon from '@mui/icons-material/Pause';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {useState} from "react";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
+import DateUtil from "../../util/dateUtil.js";
 
 const initState = {
   boardId: 0,
   username: "",
-  title:"",
-  content:"",
-  createdAt:"",
-  classifiaction:"",
+  title: "",
+  content: "",
+  createdAt: "",
+  classifiaction: "",
   originalFileNameList: [],
-  uploadedFileNameList:[],
+  uploadedFileNameList: [],
 }
 
 const BoardDetailComponent = () => {
-  const location = useLocation();
-  const {moveToList,moveToMain, moveToModify,page,size,searchSort,searchKeyword} = useCustomMove();
+
+  const Demo = styled('div')(({theme}) => ({
+    backgroundColor: theme.palette.background.paper,
+  }));
+
   const {
-    title = "제목이 없습니다.",
-    content = "내용이 없습니다.",
-    username = "정보 없음",
-    createdAt = "정보 없음"
-  } = location.state || {};
+    moveToList,
+    moveToMain,
+    moveToModify,
+    page,
+    size,
+    searchSort,
+    searchKeyword
+  } = useCustomMove();
   const {id: boardId} = useParams();
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState({})
   const [hasDownloaded, setHasDownloaded] = useState({})
-  const{isLogin,moveToLoginReturn} =useCustomLogin()
+  const {isLogin, moveToLoginReturn} = useCustomLogin()
   const userInfo = getCookie('user');
+
   if (!isLogin) {
     return moveToLoginReturn()
   }
@@ -60,7 +67,7 @@ const BoardDetailComponent = () => {
     mutationFn: postDeleteBoard,
     onSuccess: () => {
       toast.success("삭제되었습니다.");
-      moveToList({page,size,searchKeyword,searchSort});
+      moveToList({page, size, searchKeyword, searchSort});
     },
     onError: () => {
       toast.error("본인만 삭제할 수 있습니다.");
@@ -72,6 +79,10 @@ const BoardDetailComponent = () => {
     queryFn: () => getBoard(boardId),
   });
 
+  function formatDateFrom(date) {
+    const dateUtil = new DateUtil();
+    return dateUtil.formatDate(new Date(date));
+  }
 
   const board = data || initState
 
@@ -98,11 +109,11 @@ const BoardDetailComponent = () => {
     }
   };
 
-  const handleClickDownload = (uploadFileName,index) => {
+  const handleClickDownload = (uploadFileName, index) => {
     if (isSuccess) {
       const fileName = uploadFileName
       const params = {boardId: data.boardId, fileName: fileName}
-      setIsLoading(prev => ({...prev,[index]: true}))
+      setIsLoading(prev => ({...prev, [index]: true}))
       postDownload(params).then(data => {
         const url = window.URL.createObjectURL(new Blob([data]))
         const link = document.createElement('a')
@@ -112,8 +123,8 @@ const BoardDetailComponent = () => {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        setIsLoading(prev => ({...prev,[index]: false}))
-        setHasDownloaded(prev => ({...prev,[index]: true}))
+        setIsLoading(prev => ({...prev, [index]: false}))
+        setHasDownloaded(prev => ({...prev, [index]: true}))
       })
       .catch(err => {
         if (err.response.data.ERROR === "REQUIRED_LOGIN") {
@@ -130,10 +141,6 @@ const BoardDetailComponent = () => {
     setOpen(false)
   }
 
-  const Demo = styled('div')(({theme}) => ({
-    backgroundColor: theme.palette.background.paper,
-  }));
-
   return (
       <Box sx={{maxWidth: '800px', margin: '0 auto', padding: '20px'}}>
         <Paper elevation={3} sx={{padding: 3, marginBottom: 3}}>
@@ -145,7 +152,7 @@ const BoardDetailComponent = () => {
             marginBottom: 2
           }}>
             <span>작성자: {board.username}</span>
-            <span>작성일: {board.createdAt}</span>
+            <span>작성일: {formatDateFrom(board.createdAt)}</span>
           </Box>
           <Divider sx={{margin: '20px 0'}}/>
           <Box
@@ -181,8 +188,10 @@ const BoardDetailComponent = () => {
                       <ListItem key={index}
                                 secondaryAction={
                                   <IconButton
-                                      disabled={isLoading[index] || hasDownloaded[index]}
-                                      onClick={() => handleClickDownload(uploadFileName, index)}
+                                      disabled={isLoading[index]
+                                          || hasDownloaded[index]}
+                                      onClick={() => handleClickDownload(
+                                          uploadFileName, index)}
                                       name={uploadFileName}
                                       edge="end"
                                       aria-label="download">
