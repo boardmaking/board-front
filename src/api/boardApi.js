@@ -1,4 +1,4 @@
-import {BOARD, IMAGE} from "./config.js";
+import {BOARD} from "./config.js";
 import jwtAxios from "../util/jwtUtil.jsx";
 
 export const getList = async (param) => {
@@ -29,7 +29,7 @@ export const postModify = async (params) => {
 }
 
 export const uploadImage = async (params) => {
-  return (await jwtAxios.post(`${IMAGE}/upload`, params, {
+  return (await jwtAxios.post(`${BOARD}/upload`, params, {
     headers: {
       'Content-Type': 'multipart/form-data',
     }

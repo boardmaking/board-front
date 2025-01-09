@@ -48,6 +48,7 @@ function BoardListComponent() {
 
   const serverData = response?.data || initState
 
+
   const handleClickPage = (pageParam) => {
     moveToList(pageParam)
   }
