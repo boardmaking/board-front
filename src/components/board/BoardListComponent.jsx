@@ -28,7 +28,6 @@ function BoardListComponent() {
   if (!isLogin) {
     return moveToLoginReturn()
   }
-  console.log('리스트')
   const {data: response} = useQuery({
     queryKey: ['boards/list', {
       refresh,
@@ -48,7 +47,6 @@ function BoardListComponent() {
   });
 
   const serverData = response?.data || initState
-  console.log('serverData', serverData)
 
   const handleClickPage = (pageParam) => {
     moveToList(pageParam)
