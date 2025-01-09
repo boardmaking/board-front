@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'dev', url: 'https://github.com/boardmaking/board-front.git'
+                git branch: 'renewal', url: 'https://github.com/boardmaking/board-front.git'
             }
         }
 
