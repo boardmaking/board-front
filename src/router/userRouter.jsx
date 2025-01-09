@@ -4,8 +4,8 @@ import {lazy, Suspense} from "react";
 const Loading = <Box sx={{display: 'flex'}}><CircularProgress/></Box>
 const LoginPage = lazy(()=>import("../pages/user/LoginPage.jsx"))
 const JoinPage = lazy(()=>import("../pages/user/JoinPage.jsx"))
-const NaverLoginPage=lazy(()=>import("../pages/user/oauth/NaverLoginRedirectPage.jsx"))
-const KakaoLoginPage=lazy(()=>import("../pages/user/oauth/KakaoLoginRedirectPage.jsx"))
+const NaverLoginPage=lazy(()=>import("../pages/user/social/NaverLoginRedirectPage.jsx"))
+const KakaoLoginPage=lazy(()=>import("../pages/user/social/KakaoLoginRedirectPage.jsx"))
 
 const userRouter = () => {
 return[
