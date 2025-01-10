@@ -4,6 +4,7 @@ import {useQuery} from "@tanstack/react-query";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 import {getList} from "../../api/boardApi.js";
 import PageComponent from "../common/PageComponent.jsx";
+import {BOARD} from "../../api/config.js";
 
 const initState = {
   content: [],
@@ -48,7 +49,6 @@ function BoardListComponent() {
 
   const serverData = response?.data || initState
 
-
   const handleClickPage = (pageParam) => {
     moveToList(pageParam)
   }
@@ -84,7 +84,7 @@ function BoardListComponent() {
                               }}
                           >
                             <img
-                                src="https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=800"
+                                src={`${BOARD}/files/${item.imageNameList[0]}?fileType=IMAGE`}
                                 className="w-full h-auto rounded-lg"/>
                           </div>
 
