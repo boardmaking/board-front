@@ -84,7 +84,7 @@ function BoardListComponent() {
                               }}
                           >
                             <img
-                                src={`${BOARD}/files/${item.imageNameList[0]}?fileType=IMAGE`}
+                                src={`${BOARD}/files/thumbnail_${item.imageNameList[0]}?fileType=IMAGE`}
                                 className="w-full h-auto rounded-lg"/>
                           </div>
 
