@@ -5,6 +5,7 @@ import useCustomMove from "../../hooks/useCustomMove.jsx";
 import {getList} from "../../api/boardApi.js";
 import PageComponent from "../common/PageComponent.jsx";
 import {BOARD} from "../../api/config.js";
+import DateUtil from "../../util/dateUtil.js";
 
 const initState = {
   content: [],
@@ -53,6 +54,11 @@ function BoardListComponent() {
     moveToList(pageParam)
   }
 
+  function formatDateFrom(date) {
+    const dateUtil = new DateUtil();
+    return dateUtil.formatDate(new Date(date));
+  }
+
   return (
       <>
 
@@ -99,7 +105,7 @@ function BoardListComponent() {
                           </h2>
 
                           <p className="text-xs leading-normal">
-                            content
+                            {formatDateFrom(item.createdAt)}
                           </p>
                         </div>
                     )) :
