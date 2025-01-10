@@ -1,5 +1,6 @@
 import {BOARD} from "./config.js";
 import jwtAxios from "../util/jwtUtil.jsx";
+import axios from "axios";
 
 export const getList = async (param) => {
   return (await jwtAxios.get(`${BOARD}`, {
@@ -21,7 +22,7 @@ export const getBoard = async (boardId) => {
 }
 
 export const postDeleteBoard = async (params) => {
-  return (await jwtAxios.delete(`${BOARD}`, {data:params})).data
+  return (await jwtAxios.delete(`${BOARD}`, {data: params})).data
 }
 
 export const postModify = async (params) => {
@@ -36,6 +37,12 @@ export const uploadImage = async (params) => {
   })).data
 }
 export const postDownload = async (params) => {
-  return (await jwtAxios.post(`${BOARD}/download`,params,{responseType:'blob'})).data
+  console.log(params)
+  return (await axios.get(`${BOARD}/files/${params.fileName}`, {
+            responseType: 'blob',
+            params: {
+              fileType: params.fileType,
+            },
+          })).data
 
 }

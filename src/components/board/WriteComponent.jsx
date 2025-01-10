@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {v4 as uuidv4} from 'uuid';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import {
@@ -10,11 +10,11 @@ import {
   ListItemText,
   TextField,
 } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
-import { postBoard, uploadImage } from '../../api/boardApi.js';
+import {useMutation} from '@tanstack/react-query';
+import {postBoard, uploadImage} from '../../api/boardApi.js';
 import TextFieldComponent from '../common/TextFieldComponent.jsx';
 import useCustomMove from '../../hooks/useCustomMove.jsx';
-import { toast } from 'react-toastify';
+import {toast} from 'react-toastify';
 import FileUploadComponent from '../common/FileUploadComponent.jsx';
 import IconButton from '@mui/material/IconButton';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -22,7 +22,8 @@ import ClearIcon from '@mui/icons-material/Clear';
 import ModalComponent from '../common/ModalComponent.jsx';
 import useCustomLogin from '../../hooks/useCustomLogin.jsx';
 import ClassificationComponent from './ClassificationComponent.jsx';
-import { base64ToBlob } from '../../util/fileUtil.js';
+import {base64ToBlob} from '../../util/fileUtil.js';
+import {BOARD} from "../../api/config.js";
 
 const formats = [
   'font',
@@ -111,7 +112,7 @@ const WriteComponent = () => {
           const base64Data = imgTag.match(/data:image\/([a-zA-Z]*);base64,([A-Za-z0-9+\/=]+)/);
           if (base64Data) {
             const blob = base64ToBlob(base64Data[2], base64Data[1]);
-            const uuid = uuidv4();
+            const uuid = uuidv4()
             const imagePlace = `[${uuid}]`;
             const contentWithoutImages = updatedContent.replace(imgTag, imagePlace);
             const formData = new FormData();
@@ -119,7 +120,7 @@ const WriteComponent = () => {
 
             try {
               const data = await uploadImage(formData);
-              updatedContent = contentWithoutImages.replace(imagePlace, `<img src="${data.savePath}" alt="${uuid}" />`);
+              updatedContent = contentWithoutImages.replace(imagePlace, `<img src="${BOARD}/files/${data}?fileType=IMAGE" alt="${uuid}" />`);
               resolve();
             } catch (err) {
               reject(err);
