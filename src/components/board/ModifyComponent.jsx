@@ -49,7 +49,7 @@ const initState = {
 
 const ModifyComponent = () => {
   const {id: boardId} = useParams();
-  const {moveToMain} = useCustomMove();
+  const {moveToList,page,size,searchKeyword,searchSort} = useCustomMove();
   const quillRef = useRef(null);
   const titleRef = useRef(null);
   const [savedFileStore, setSavedFileStore] = useState([])
@@ -67,7 +67,7 @@ const ModifyComponent = () => {
     onError: (error) => {
       console.error("게시글 조회 실패:", error);
       toast.error("게시글을 불러오는데 실패했습니다.");
-      moveToMain();
+      moveToList({page: 0});
     }
   });
 
@@ -218,7 +218,7 @@ const ModifyComponent = () => {
     boardMutation.mutate(formData, {
       onSuccess: () => {
         toast.success("글이 수정되었습니다.");
-        moveToMain();
+        moveToList({page:0});
       },
       onError: (error) => {
         console.error('수정 실패:', error);
@@ -377,12 +377,20 @@ const ModifyComponent = () => {
             ))
             : null}
         <Button
-            variant="outlined"
+            variant="contained"
             color="primary"
             style={{position: "relative", zIndex: '2', marginTop: 20}}
             onClick={handleClickUpdate}
         >
           수정하기
+        </Button>
+        <Button
+            variant="outlined"
+            color="primary"
+            style={{position: "relative", zIndex: '2', marginTop: 10}}
+            onClick={()=>moveToList({page,size,searchKeyword,searchSort})}
+        >
+          취소
         </Button>
         <ModalComponent
             title="회원 전용 기능"

@@ -67,7 +67,7 @@ const BoardDetailComponent = () => {
     mutationFn: postDeleteBoard,
     onSuccess: () => {
       toast.success("삭제되었습니다.");
-      moveToList({page, size, searchKeyword, searchSort});
+      moveToList({page: 0});
     },
     onError: () => {
       toast.error("본인만 삭제할 수 있습니다.");
@@ -226,7 +226,8 @@ const BoardDetailComponent = () => {
             gap: 1,
             marginTop: 3
           }}>
-            <Button onClick={moveToMain} variant="outlined"
+            <Button onClick={()=>moveToList(
+                {page, size, searchKeyword, searchSort})} variant="outlined"
                     color="primary">목록</Button>
             <Button onClick={handleClickUpdate} variant="outlined"
                     color="primary">수정</Button>
