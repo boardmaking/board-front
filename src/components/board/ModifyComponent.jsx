@@ -26,6 +26,7 @@ import FileUploadComponent from "../common/FileUploadComponent.jsx";
 import ModalComponent from "../common/ModalComponent.jsx";
 import {base64ToBlob} from "../../util/fileUtil.js";
 import {v4 as uuidv4} from "uuid";
+import {BOARD} from "../../api/config.js";
 
 const formats = [
   'font', 'header', 'bold', 'italic', 'underline', 'strike',
@@ -33,16 +34,6 @@ const formats = [
   'color', 'background', 'size', 'h1', 'image'
 ];
 
-/*const initState = {
-  username: '',
-  boardId: '',
-  title: '',
-  content: '',
-  classification: '',
-  createAt: '',
-  files: [],
-  newFiles: []
-}*/
 const initState = {
   username: '',
   boardId: '',
@@ -181,7 +172,7 @@ const ModifyComponent = () => {
               try {
                 const data = await uploadImage(formData);
                 newContent = contentWithoutImages.replace(imagePlace,
-                    `<img src="${data.savePath}" alt="${uuid}" />`);
+                    `<img src="${BOARD}/files/${data}?fileType=IMAGE" alt="${uuid}" />`);
                 resolve();
               } catch (err) {
                 reject(err);

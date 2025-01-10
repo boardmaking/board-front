@@ -9,7 +9,7 @@ import {
   ListItemText,
   Paper
 } from "@mui/material";
-import {useLocation, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {getBoard, postDeleteBoard, postDownload} from "../../api/boardApi.js";
 import {getCookie} from "../../util/cookieUtil.jsx";
@@ -112,7 +112,7 @@ const BoardDetailComponent = () => {
   const handleClickDownload = (uploadFileName, index) => {
     if (isSuccess) {
       const fileName = uploadFileName
-      const params = {boardId: data.boardId, fileName: fileName}
+      const params = {fileType:"FILE",fileName}
       setIsLoading(prev => ({...prev, [index]: true}))
       postDownload(params).then(data => {
         const url = window.URL.createObjectURL(new Blob([data]))
