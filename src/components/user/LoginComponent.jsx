@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import ModalComponent from "../common/ModalComponent.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
@@ -14,12 +14,19 @@ const kakaoLink = getKakaoLoginLink()
 
 function LoginComponent() {
 
-  const {doLogin} = useCustomLogin()
+  const {doLogin,isLogin} = useCustomLogin()
+  const [loginStatus, setLoginStatus] = useState(false)
   const {moveToPath} = useCustomMove()
   const [user, setUser] = useState(initState)
   const [fail, setFail] = useState(false)
   const [success, setSuccess] = useState(false)
   const [result, setResult] = useState(null)
+
+  useEffect(() => {
+    if (isLogin) {
+      setLoginStatus(true)
+    }
+  },[])
 
   const handleChangeInput = (e) => {
     const {name, value} = e.target;
@@ -60,6 +67,11 @@ function LoginComponent() {
     if (fail) {
       setFail(false)
     }
+  }
+
+  const handleClickReturnMain = () => {
+    setLoginStatus(false)
+    moveToPath('/')
   }
 
   return (
@@ -147,6 +159,12 @@ function LoginComponent() {
             </div>
           </div>
         </div>
+        {loginStatus && <ModalComponent
+            open={loginStatus}
+            title={`잘못된 접근`}
+            content={'이미 로그인이 되어있습니다.'}
+            handleClose={handleClickReturnMain}
+        />}
         {result && <ModalComponent
             open={success}
             title={`안녕하세요 ${result}, 님`}

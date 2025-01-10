@@ -11,16 +11,20 @@ const useCustomLogin = () => {
 
   const isLogin = !!loginState.email
 
-  const isAdmin = () => {
+  const isNotAdmin = () => {
     if (isLogin) {
       const roles = loginState.roles
       for (let i = 0; i < roles.length; i++) {
         if (roles[i] === 'ADMIN') {
-          return true
+          return false
         }
       }
     }
-    return false
+    return true
+  }
+
+  const isAdmin = () => {
+    return  !isNotAdmin()
   }
 
   const doLogin = async (loginParam) => {
@@ -60,6 +64,7 @@ const useCustomLogin = () => {
     moveToLogin,
     moveToLoginReturn,
     moveToKakao,
+    isNotAdmin,
     isAdmin
   }
 }

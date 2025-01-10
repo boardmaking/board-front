@@ -1,9 +1,11 @@
 import useCustomLogin from "../hooks/useCustomLogin.jsx";
 import BasicLayout from "../layouts/BasicLayout.jsx";
+import useCustomMove from "../hooks/useCustomMove.jsx";
 
 function MainIndexComponent() {
 
-  const {isLogin, moveToLoginReturn} = useCustomLogin()
+  const {isLogin,isAdmin ,moveToLoginReturn} = useCustomLogin()
+  const {moveToPath} = useCustomMove()
 
   if (!isLogin) {
     return moveToLoginReturn()
@@ -24,12 +26,20 @@ function MainIndexComponent() {
                 Have a good day
               </h1>
               <p className="text-md md:text-lg text-center text-white ">
-                get posting
+                Areum nuri medicom
               </p>
 
-              <a href="/register"
-                 className="mt-6 inline-block bg-white text-black no-underline px-4 py-3 shadow-lg">Find
-                out more</a>
+              {isAdmin() ?
+                  <button onClick={()=>moveToPath("/users/join")}
+                     className="mt-6 inline-block bg-white text-black no-underline px-4 py-3 shadow-lg">
+                    Join With Your Member
+                  </button>
+                  :
+                  <button onClick={()=>moveToPath("/boards/list")}
+                     className="mt-6 inline-block bg-white text-black no-underline px-4 py-3 shadow-lg">
+                    Find Our Posting
+                  </button>
+              }
             </div>
 
           </div>
