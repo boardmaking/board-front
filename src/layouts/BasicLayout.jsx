@@ -11,9 +11,7 @@ const initState = {
 export default function BasicLayout({children}) {
   const [searchCondition, setSearchCondition] = useState({...initState});
   const {moveToList, moveToMain, moveToPath} = useCustomMove();
-  const {doLogout, isLogin} = useCustomLogin();
-  const location = useLocation();
-  const pathname = location.pathname;
+  const {doLogout, isLogin,loginState} = useCustomLogin();
 
   const handleChangeInput = (e) => {
     const {name, value} = e.target;
@@ -66,12 +64,16 @@ export default function BasicLayout({children}) {
             </div>
             <div
                 className="w-full md:w-auto mb-6 md:mb-0 text-center md:text-right">
+              {isLogin && <span className="mr-2">{loginState.username}</span>}
               <div
                   className="inline-block no-underline bg-black text-white text-sm py-2 px-3">
                 {isLogin ?
+                    <>
                     <div onClick={handleClickLogout}>
                       Logout
-                    </div> :
+                    </div>
+                    </>
+                      :
                     <Link to="/users/join">
                       Sign Up
                     </Link>

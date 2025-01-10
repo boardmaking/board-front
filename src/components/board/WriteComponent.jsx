@@ -46,13 +46,19 @@ const formats = [
 ];
 
 const WriteComponent = () => {
-  const { moveToMain ,moveToList ,page,size,searchKeyword,searchSort } = useCustomMove();
+  const {
+    moveToList,
+    page,
+    size,
+    searchKeyword,
+    searchSort
+  } = useCustomMove();
   const [values, setValues] = useState('');
   const quillRef = useRef(null);
   const titleRef = useRef(null);
   const [tempImages, setTempImages] = useState(new Map());
   const [fileError, setFileError] = useState(null);
-  const{isLogin,moveToLoginReturn} =useCustomLogin()
+  const {isLogin, moveToLoginReturn} = useCustomLogin()
   const [board, setBoard] = useState({
     email: '',
     title: '',
@@ -109,18 +115,21 @@ const WriteComponent = () => {
       const imageUploadPromises = imgTags.map((imgTag) => {
         // eslint-disable-next-line no-async-promise-executor
         return new Promise(async (resolve, reject) => {
-          const base64Data = imgTag.match(/data:image\/([a-zA-Z]*);base64,([A-Za-z0-9+\/=]+)/);
+          const base64Data = imgTag.match(
+              /data:image\/([a-zA-Z]*);base64,([A-Za-z0-9+\/=]+)/);
           if (base64Data) {
             const blob = base64ToBlob(base64Data[2], base64Data[1]);
             const uuid = uuidv4()
             const imagePlace = `[${uuid}]`;
-            const contentWithoutImages = updatedContent.replace(imgTag, imagePlace);
+            const contentWithoutImages = updatedContent.replace(imgTag,
+                imagePlace);
             const formData = new FormData();
             formData.append('image', blob, uuid + '.' + base64Data[1]);
 
             try {
               const data = await uploadImage(formData);
-              updatedContent = contentWithoutImages.replace(imagePlace, `<img src="${BOARD}/files/${data}?fileType=IMAGE" alt="${uuid}" />`);
+              updatedContent = contentWithoutImages.replace(imagePlace,
+                  `<img src="${BOARD}/files/${data}?fileType=IMAGE" alt="${uuid}" />`);
               resolve();
             } catch (err) {
               reject(err);
@@ -138,7 +147,6 @@ const WriteComponent = () => {
     }
   };
 
-
   const imageHandler = () => {
     const fileInput = document.createElement('input');
     fileInput.setAttribute('type', 'file');
@@ -148,8 +156,12 @@ const WriteComponent = () => {
 
     fileInput.addEventListener('change', async function () {
       const file = this.files[0];
-      if (!file) return;
-      if (!validateFile(file)) return;
+      if (!file) {
+        return;
+      }
+      if (!validateFile(file)) {
+        return;
+      }
 
       const reader = new FileReader();
       reader.onload = () => {
@@ -161,7 +173,7 @@ const WriteComponent = () => {
 
         quill.insertEmbed(range.index, 'image', base64);
 
-        setTempImages((prev) => new Map(prev.set(tempId, { file, base64 })));
+        setTempImages((prev) => new Map(prev.set(tempId, {file, base64})));
       };
       reader.readAsDataURL(file);
     });
@@ -173,7 +185,8 @@ const WriteComponent = () => {
     .find((row) => row.startsWith('user='));
 
     if (cookieValue) {
-      const userInfo = JSON.parse(decodeURIComponent(cookieValue.split('=')[1]));
+      const userInfo = JSON.parse(
+          decodeURIComponent(cookieValue.split('=')[1]));
       setBoard((prevBoard) => ({
         ...prevBoard,
         email: userInfo.email,
@@ -195,11 +208,11 @@ const WriteComponent = () => {
       () => ({
         toolbar: {
           container: [
-            [{ size: ['small', false, 'large', 'huge'] }],
-            [{ align: [] }],
+            [{size: ['small', false, 'large', 'huge']}],
+            [{align: []}],
             ['bold', 'italic', 'underline', 'strike'],
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            [{ color: [] }, { background: [] }],
+            [{list: 'ordered'}, {list: 'bullet'}],
+            [{color: []}, {background: []}],
             ['image'],
           ],
           handlers: {
@@ -234,7 +247,8 @@ const WriteComponent = () => {
       });
 
       if (totalFileSize > TOTAL_FILE_MAX_SIZE) {
-        throw new Error(`파일 크기가 너무 큽니다. 최대 크기: ${TOTAL_FILE_MAX_SIZE / (1024 * 1024)}MB`);
+        throw new Error(
+            `파일 크기가 너무 큽니다. 최대 크기: ${TOTAL_FILE_MAX_SIZE / (1024 * 1024)}MB`);
       }
 
       formData.append('username', board.username);
@@ -246,7 +260,8 @@ const WriteComponent = () => {
       await boardMutation.mutateAsync(formData);
       toast.success('글이 작성되었습니다.');
       moveToList({
-        page,size,searchKeyword,searchSort})
+        page, size, searchKeyword, searchSort
+      })
     } catch (error) {
       console.error('작성 실패:', error.message);
       if (error.response?.data?.ERROR === 'REQUIRED_LOGIN') {
@@ -274,7 +289,7 @@ const WriteComponent = () => {
     const FILE_MAX_SIZE = 20 * 1024 * 1024;
     try {
       board[e.target.name] = e.target.files;
-      setBoard({ ...board });
+      setBoard({...board});
       const files = board.files;
       const fileList = Array.from(files);
       for (let i = 0; i < fileList.length; i++) {
@@ -301,17 +316,17 @@ const WriteComponent = () => {
   }
 
   return (
-      <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
+      <div style={{display: 'flex', flexDirection: 'column', padding: '20px'}}>
         <TextFieldComponent
             label="작성자"
             value={board.username}
-            InputProps={{ readOnly: true }}
+            InputProps={{readOnly: true}}
             variant="outlined"
             fullWidth
         />
         <TextField
             ref={titleRef}
-            style={{ marginTop: 10 }}
+            style={{marginTop: 10}}
             label="제목"
             value={board.title}
             onChange={handleTitleChange}
@@ -327,7 +342,7 @@ const WriteComponent = () => {
             onChange={handleClassificationChange}
         />
 
-        <div style={{ height: '500px', border: '1px solid #ccc', marginTop: 10 }}>
+        <div style={{height: '500px', border: '1px solid #ccc', marginTop: 10}}>
           <ReactQuill
               ref={quillRef}
               theme="snow"
@@ -335,11 +350,11 @@ const WriteComponent = () => {
               formats={formats}
               value={values}
               onChange={handleEditorChange}
-              style={{ height: '100%' }}
+              style={{height: '100%'}}
           />
         </div>
 
-        <FileUploadComponent handleChangeUploadFile={handleChangeUploadFile} />
+        <FileUploadComponent handleChangeUploadFile={handleChangeUploadFile}/>
 
         {fileStore.length > 0
             ? fileStore.map((uploadFile, index) => (
@@ -348,14 +363,14 @@ const WriteComponent = () => {
                     onClick={() => handleClickFileClear(index)}
                     edge="end"
                     aria-label="upload">
-                  <ClearIcon name={uploadFile.name} />
+                  <ClearIcon name={uploadFile.name}/>
                 </IconButton>}>
                   <ListItemAvatar>
                     <Avatar>
-                      <FolderIcon />
+                      <FolderIcon/>
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText primary={uploadFile.name} />
+                  <ListItemText primary={uploadFile.name}/>
                 </ListItem>
             ))
             : null}
@@ -363,12 +378,19 @@ const WriteComponent = () => {
         <Button
             variant="outlined"
             color="primary"
-            style={{ position: 'relative', zIndex: '2' }}
+            style={{position: 'relative', zIndex: '2'}}
             onClick={handleClickWrite}
         >
           글작성
         </Button>
-
+        <Button
+            variant="outlined"
+            color="primary"
+            style={{position: "relative", zIndex: '2', marginTop: 10}}
+            onClick={() => moveToList({page, size, searchKeyword, searchSort})}
+        >
+          취소
+        </Button>
         <ModalComponent
             title="회원 전용 기능"
             content="회원이 아니어서 글을 작성할 수 없습니다. 로그인 해주세요:)"
