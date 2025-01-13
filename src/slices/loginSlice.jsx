@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {postLogin} from "../api/userApi.js";
+import {postLogin, postLogout} from "../api/userApi.js";
 import {getCookie, removeCookie, setCookie} from "../util/cookieUtil.jsx";
 
 const initState = {
@@ -11,6 +11,7 @@ const loadMemberCookie = () => {
 }
 
 export const loginPostAsync = createAsyncThunk('loginPostAsync',(param)=>postLogin(param))
+export const logoutPostAsync = createAsyncThunk('logoutPostAsync',()=>postLogout())
 
 const loginSlice = createSlice({
   name: 'loginSlice',
@@ -21,6 +22,7 @@ const loginSlice = createSlice({
       return {email: action.payload.email}
     },
     logout: () => {
+
       removeCookie('user')
       return {...initState}
     }
@@ -33,6 +35,13 @@ const loginSlice = createSlice({
       }
 
       return payload
+    })
+    .addCase(logoutPostAsync.fulfilled,(state,action)=>{
+      const payload = action.payload
+      if(payload.data.success){
+        removeCookie('user')
+      }
+      return {...initState}
     })
     .addCase(loginPostAsync.pending,(state,action)=>{
     })
