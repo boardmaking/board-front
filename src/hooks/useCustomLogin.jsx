@@ -1,6 +1,6 @@
 import {Navigate, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {loginPostAsync, logout} from "../slices/loginSlice";
+import {loginPostAsync, logout, logoutPostAsync} from "../slices/loginSlice";
 
 const useCustomLogin = () => {
   const navigate = useNavigate()
@@ -32,8 +32,8 @@ const useCustomLogin = () => {
     return action.payload
   }
 
-  const doLogout = () => {
-    dispatch(logout())
+  const doLogout = async () => {
+     await dispatch(logoutPostAsync())
   }
 
   const moveToKakao = (path, email, name) => {

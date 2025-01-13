@@ -18,6 +18,10 @@ export const postLogin = async (loginParam) => {
   return response.data;
 }
 
+export const postLogout = async () => {
+  return await axios.delete(`${USER}/logout`, {})
+}
+
 export const postJoin = async (user) => {
   return (await jwtAxios.post(`${USER}/join`, user)).data
 }
