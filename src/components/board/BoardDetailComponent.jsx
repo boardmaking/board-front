@@ -12,7 +12,6 @@ import {
 import {useParams} from "react-router-dom";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {getBoard, postDeleteBoard, postDownload} from "../../api/boardApi.js";
-import {getCookie} from "../../util/cookieUtil.jsx";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 import {toast} from "react-toastify";
 import {styled} from "@mui/material/styles";
@@ -25,8 +24,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {useState} from "react";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import DateUtil from "../../util/dateUtil.js";
+import CommentComponent from "../comment/CommentComponent.jsx";
 
 const initState = {
+  userId: 0,
   boardId: 0,
   username: "",
   title: "",
@@ -45,7 +46,6 @@ const BoardDetailComponent = () => {
 
   const {
     moveToList,
-    moveToMain,
     moveToModify,
     page,
     size,
@@ -56,12 +56,14 @@ const BoardDetailComponent = () => {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState({})
   const [hasDownloaded, setHasDownloaded] = useState({})
-  const {isLogin, moveToLoginReturn} = useCustomLogin()
-  const userInfo = getCookie('user');
+  const {isLogin, moveToLoginReturn,loginState} = useCustomLogin()
 
   if (!isLogin) {
     return moveToLoginReturn()
   }
+
+  const loginUserId = loginState.id
+  console.log("loginUserId", loginUserId)
 
   const boardMutation = useMutation({
     mutationFn: postDeleteBoard,
@@ -79,30 +81,27 @@ const BoardDetailComponent = () => {
     queryFn: () => getBoard(boardId),
   });
 
-  function formatDateFrom(date) {
-    const dateUtil = new DateUtil();
-    return dateUtil.formatDate(new Date(date));
-  }
-
   const board = data || initState
 
+  console.log(data)
+
   const handleClickDelete = () => {
-    if (!userInfo) {
+    if (!loginState) {
       toast.error("로그인 후 삭제할 수 있습니다.");
       return;
     }
     boardMutation.mutate({
-      userId: userInfo.id,
+      userId: loginState.id,
       boardId: boardId
     });
   };
 
   const handleClickUpdate = () => {
-    if (!userInfo) {
+    if (!loginState) {
       toast.error("로그인 후 수정할 수 있습니다.");
       return;
     }
-    if (userInfo.username === board.username) {
+    if (loginState.username === board.username) {
       moveToModify(boardId);
     } else {
       toast.error("본인만 수정할 수 있습니다.");
@@ -112,7 +111,7 @@ const BoardDetailComponent = () => {
   const handleClickDownload = (uploadFileName, index) => {
     if (isSuccess) {
       const fileName = uploadFileName
-      const params = {fileType:"FILE",fileName}
+      const params = {fileType: "FILE", fileName}
       setIsLoading(prev => ({...prev, [index]: true}))
       postDownload(params).then(data => {
         const url = window.URL.createObjectURL(new Blob([data]))
@@ -152,7 +151,7 @@ const BoardDetailComponent = () => {
             marginBottom: 2
           }}>
             <span>작성자: {board.username}</span>
-            <span>작성일: {formatDateFrom(board.createdAt)}</span>
+            <span>작성일: {DateUtil.formatDateFrom(board.createdAt)}</span>
           </Box>
           <Divider sx={{margin: '20px 0'}}/>
           <Box
@@ -226,16 +225,26 @@ const BoardDetailComponent = () => {
             gap: 1,
             marginTop: 3
           }}>
-            <Button onClick={()=>moveToList(
+            <Button onClick={() => moveToList(
                 {page, size, searchKeyword, searchSort})} variant="outlined"
-                    color="primary">목록</Button>
-            <Button onClick={handleClickUpdate} variant="outlined"
-                    color="primary">수정</Button>
-            <Button onClick={handleClickDelete} variant="outlined"
-                    color="error">삭제</Button>
+                    color="primary">
+              목록
+            </Button>
+            {loginUserId === board.userId &&
+              <>
+                <Button onClick={handleClickUpdate} variant="outlined"
+                        color="primary">
+                  수정
+                </Button>
+                <Button onClick={handleClickDelete} variant="outlined"
+                        color="error">
+                  삭제
+                </Button>
+              </>
+            }
           </Box>
         </Paper>
-        {/*<CommentComponent/>*/}
+        <CommentComponent/>
         <ModalComponent
             title={"회원 전용 기능"}
             content={"회원이 아니어서 파일을 다운로드할 수 없습니다. 로그인 해주세요:)"}

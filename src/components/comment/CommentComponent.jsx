@@ -20,6 +20,7 @@ import {toast} from "react-toastify";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
+import DateUtil from "../../util/dateUtil.js";
 
 function CommentComponent() {
   const [values, setValues] = useState('');
@@ -96,11 +97,16 @@ function CommentComponent() {
     })
   }
 
+  const handleChangeInput = (e) => {
+    const { value } = e.target;
+    setValues(value)
+  }
+
   return (
       <Paper elevation={3} sx={{padding: 3}}>
         <h3>댓글 ({commentList.length})</h3>
         <List>
-          {commentList.map(({id, userId, username, content, createAt}) => (
+          {commentList.length > 0 && commentList.map(({id, userId, username, content, createAt}) => (
               <Box key={id}>
                 <ListItem alignItems="flex-start">
                   <ListItemAvatar>
@@ -115,9 +121,9 @@ function CommentComponent() {
                             <span>{username}</span>
                           </Box>
                       )}
-                      secondary={content}
+                      secondary={DateUtil.formatDateFrom(createAt)}
                   />
-                  <ListItemText secondary={createAt}/>
+                  <ListItemText secondary={content}/>
                   {userId === loginUserId ?
 
                       <IconButton
@@ -143,7 +149,7 @@ function CommentComponent() {
               rows={2}
               placeholder={userInfo ? "댓글을 입력하세요" : "댓글을 작성하려면 로그인이 필요합니다"}
               value={values}
-              onChange={(e) => setValues(e.target.value)}
+              onChange={handleChangeInput}
               size="small"
               disabled={!userInfo}
           />

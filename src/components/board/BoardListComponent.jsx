@@ -54,11 +54,6 @@ function BoardListComponent() {
     moveToList(pageParam)
   }
 
-  function formatDateFrom(date) {
-    const dateUtil = new DateUtil();
-    return dateUtil.formatDate(new Date(date));
-  }
-
   return (
       <>
 
@@ -105,7 +100,7 @@ function BoardListComponent() {
                           </h2>
 
                           <p className="text-xs leading-normal">
-                            {formatDateFrom(item.createdAt)}
+                            {DateUtil.formatDateFrom(item.createdAt)}
                           </p>
                         </div>
                     )) :

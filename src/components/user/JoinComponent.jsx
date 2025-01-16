@@ -31,7 +31,7 @@ const initErrors = {
 
 function JoinComponent() {
   const {moveToPath} = useCustomMove()
-  const {isNotAdmin, moveToLoginReturn, loginState} = useCustomLogin()
+  const {isNotAdmin, doLogout} = useCustomLogin()
   const [user, setUser] = useState(initState)
   const [notAdmin, setNotAdmin] = useState(false)
   const [errors, setErrors] = useState(initErrors)
@@ -39,6 +39,7 @@ function JoinComponent() {
 
   useEffect(() => {
     if (isNotAdmin()) {
+      console.log('not admin')
       setNotAdmin(true)
     }
   }, [])
@@ -52,6 +53,7 @@ function JoinComponent() {
             회원가입 하신 계정으로 로그인해주세요.
           </>
       );
+      doLogout()
       moveToPath('/');
     },
     onError: () => {
