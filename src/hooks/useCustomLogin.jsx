@@ -14,8 +14,8 @@ const useCustomLogin = () => {
   const isNotAdmin = () => {
     if (isLogin) {
       const roles = loginState.roles
-      for (let i = 0; i < roles.length; i++) {
-        if (roles[i] === 'ADMIN') {
+      for (let i = 0; i < roles.roles.length; i++) {
+        if (roles.roles[i] === 'ADMIN') {
           return false
         }
       }
@@ -32,8 +32,8 @@ const useCustomLogin = () => {
     return action.payload
   }
 
-  const doLogout = async () => {
-     await dispatch(logoutPostAsync())
+  const doLogout = () => {
+    dispatch(logout())
   }
 
   const moveToKakao = (path, email, name) => {

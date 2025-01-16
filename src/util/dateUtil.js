@@ -33,6 +33,12 @@ class DateUtil {
         && date.getFullYear() === yesterday.getFullYear();
   }
 
+   static formatDateFrom(date) {
+    const dateUtil = new DateUtil();
+    return dateUtil.formatDate(new Date(date));
+  }
+
 }
+
 
 export default DateUtil
