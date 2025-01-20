@@ -83,8 +83,6 @@ const BoardDetailComponent = () => {
 
   const board = data || initState
 
-  console.log(data)
-
   const handleClickDelete = () => {
     if (!loginState) {
       toast.error("로그인 후 삭제할 수 있습니다.");
