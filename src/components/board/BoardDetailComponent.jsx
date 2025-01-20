@@ -63,7 +63,6 @@ const BoardDetailComponent = () => {
   }
 
   const loginUserId = loginState.id
-  console.log("loginUserId", loginUserId)
 
   const boardMutation = useMutation({
     mutationFn: postDeleteBoard,
