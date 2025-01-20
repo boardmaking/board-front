@@ -52,7 +52,6 @@ function LoginComponent() {
 
     const handleLogin = () => {
         if (saveIdFlag){
-            console.log("SAVE_ID_FLAG",user.email)
             localStorage.setItem(SAVE_ID, user.email)
         }
         doLogin(user)
