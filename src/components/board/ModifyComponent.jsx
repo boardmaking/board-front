@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import {
   Avatar,
   Button,
@@ -125,6 +125,7 @@ const ModifyComponent = () => {
         [{align: []}],
         ['bold', 'italic', 'underline', 'strike'],
         [{list: 'ordered'}, {list: 'bullet'}],
+        [{ header: '1' }, { header: '2' }],
         [{color: []}, {background: []}],
         ['image'],
       ],
@@ -153,7 +154,6 @@ const ModifyComponent = () => {
       const imgTagRegex = /<img[^>]*>/g;
       let newContent = content;
       const imgTags = content.match(imgTagRegex);
-
       if (imgTags) {
         const imageUploadPromises = imgTags.map((imgTag) => {
           // eslint-disable-next-line no-async-promise-executor

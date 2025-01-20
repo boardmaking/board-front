@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import {
   Avatar,
   Button,
@@ -107,6 +107,7 @@ const WriteComponent = () => {
   };
 
   const handleEditorChange = async (content) => {
+
     const imgTagRegex = /<img[^>]*>/g;
     let updatedContent = content;
     const imgTags = content.match(imgTagRegex);

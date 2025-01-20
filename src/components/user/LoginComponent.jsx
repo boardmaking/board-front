@@ -178,14 +178,14 @@ function LoginComponent() {
                             </div>
                         </div>
 
-                        <p className="text-center text-sm text-gray-600 font-thin">
+                        <div className="text-center text-sm text-gray-600 font-thin">
                             Don't have an account yet?
-                            <div className="text-blue-500 no-underline hover:underline">
+                            <p className="text-blue-500 no-underline hover:underline">
                                 <Link to={"/users/join"}>
                                     Sign up
                                 </Link>
-                            </div>
-                        </p>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
