@@ -111,8 +111,6 @@ const WriteComponent = () => {
     const imgTagRegex = /<img[^>]*>/g;
     let updatedContent = content;
     const imgTags = content.match(imgTagRegex);
-    console.log('imgTags', imgTags);
-    console.log('updatedContent', updatedContent);
     if (imgTags) {
       const imageUploadPromises = imgTags.map((imgTag) => {
         // eslint-disable-next-line no-async-promise-executor
