@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import {useQuery} from "@tanstack/react-query";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
@@ -6,6 +6,8 @@ import {getList} from "../../api/boardApi.js";
 import PageComponent from "../common/PageComponent.jsx";
 import {BOARD} from "../../api/config.js";
 import DateUtil from "../../util/dateUtil.js";
+import {readViewCount} from "../../api/boardViewCountApi.js";
+import {data} from "autoprefixer";
 
 const initState = {
   content: [],
@@ -27,9 +29,6 @@ function BoardListComponent() {
   const {moveToList, moveToRead, moveToWrite} = useCustomMove()
   const {searchSort, searchKeyword, page, size, refresh} = useCustomMove()
 
-  if (!isLogin) {
-    return moveToLoginReturn()
-  }
   const {data: response} = useQuery({
     queryKey: ['boards/list', {
       refresh,
@@ -49,6 +48,10 @@ function BoardListComponent() {
   });
 
   const serverData = response?.data || initState
+
+  if (!isLogin) {
+    return moveToLoginReturn()
+  }
 
   const handleClickPage = (pageParam) => {
     moveToList(pageParam)
@@ -99,9 +102,14 @@ function BoardListComponent() {
                             </button>
                           </h2>
 
-                          <p className="text-xs leading-normal">
-                            {DateUtil.formatDateFrom(item.createdAt)}
-                          </p>
+                          <ul className="text-xs leading-normal" style={{flex: 1, display: 'flex', direction: 'column', justifyContent: 'space-between' }}>
+                            <li>
+                            조회수 : {item.viewCount}
+                            </li>
+                            <li>
+                            작성일 : {DateUtil.formatDateFrom(item.createdAt)}
+                            </li>
+                          </ul>
                         </div>
                     )) :
                 <h2 className="text-xl py-4 ">게시물이 없습니다</h2>

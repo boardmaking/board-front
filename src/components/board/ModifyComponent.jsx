@@ -35,8 +35,8 @@ const formats = [
 ];
 
 const initState = {
+  boardId: 0,
   username: '',
-  boardId: '',
   title: '',
   content: '',
   uploadFileNameList: [],
@@ -64,6 +64,7 @@ const ModifyComponent = () => {
   const {data: boardData, isSuccess} = useQuery({
     queryKey: ['board', boardId],
     queryFn: () => getBoard(boardId),
+    staleTime: Infinity,
     onError: (error) => {
       console.error("게시글 조회 실패:", error);
       toast.error("게시글을 불러오는데 실패했습니다.");
@@ -73,6 +74,7 @@ const ModifyComponent = () => {
 
   useEffect(() => {
     if (isSuccess) {
+      console.log(board)
       board['username'] = boardData.username
       board['boardId'] = boardData.boardId
       board['title'] = boardData.title
@@ -83,7 +85,7 @@ const ModifyComponent = () => {
       setBoard(boardData)
       setSavedFileStore(boardData.uploadFileNameList)
     }
-  }, [boardId,boardData]);
+  }, [boardData, isSuccess]);
 
 
   const boardMutation = useMutation({

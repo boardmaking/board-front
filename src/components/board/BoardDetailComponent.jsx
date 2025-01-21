@@ -21,10 +21,11 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ModalComponent from "../common/ModalComponent.jsx";
 import PauseIcon from '@mui/icons-material/Pause';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import DateUtil from "../../util/dateUtil.js";
 import CommentComponent from "../comment/CommentComponent.jsx";
+import {increaseViewCount, readViewCount} from "../../api/boardViewCountApi.js";
 
 const initState = {
   userId: 0,
@@ -56,14 +57,25 @@ const BoardDetailComponent = () => {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState({})
   const [hasDownloaded, setHasDownloaded] = useState({})
-  const {isLogin, moveToLoginReturn,loginState} = useCustomLogin()
+  const {isLogin, moveToLoginReturn, loginState} = useCustomLogin()
+  const loginUserId = loginState.id
+  const [view, setView] = useState(0)
+
+  useEffect(() => {
+    increaseViewCount({
+      boardId: boardId,
+      userId: loginUserId,
+    }).then(data => {
+      console.log(data)
+      readViewCount({boardId}).then(data => {
+        setView(data)
+      })
+    })
+  }, [])
 
   if (!isLogin) {
     return moveToLoginReturn()
   }
-
-  const loginUserId = loginState.id
-  console.log("loginUserId", loginUserId)
 
   const boardMutation = useMutation({
     mutationFn: postDeleteBoard,
@@ -81,9 +93,12 @@ const BoardDetailComponent = () => {
     queryFn: () => getBoard(boardId),
   });
 
-  const board = data || initState
+  const viewQuery = useQuery({
+    queryKey: ['boardViewCount', boardId],
+    queryFn: () => readViewCount({boardId}),
+  });
 
-  console.log(data)
+  const board = data || initState
 
   const handleClickDelete = () => {
     if (!loginState) {
@@ -151,7 +166,18 @@ const BoardDetailComponent = () => {
             marginBottom: 2
           }}>
             <span>작성자: {board.username}</span>
-            <span>작성일: {DateUtil.formatDateFrom(board.createdAt)}</span>
+            <ul style={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              alignItems: 'flex-end',  // 오른쪽 끝 정렬
+              margin: 0, // 기본적으로 ul에는 margin이 있을 수 있으므로 제거
+              padding: 0  // padding도 기본적으로 있을 수 있으므로 제거
+            }}>
+              <span>조회수: {view}</span>
+              <span>작성일: {DateUtil.formatDateFrom(board.createdAt)}</span>
+            </ul>
           </Box>
           <Divider sx={{margin: '20px 0'}}/>
           <Box
@@ -231,16 +257,16 @@ const BoardDetailComponent = () => {
               목록
             </Button>
             {loginUserId === board.userId &&
-              <>
-                <Button onClick={handleClickUpdate} variant="outlined"
-                        color="primary">
-                  수정
-                </Button>
-                <Button onClick={handleClickDelete} variant="outlined"
-                        color="error">
-                  삭제
-                </Button>
-              </>
+                <>
+                  <Button onClick={handleClickUpdate} variant="outlined"
+                          color="primary">
+                    수정
+                  </Button>
+                  <Button onClick={handleClickDelete} variant="outlined"
+                          color="error">
+                    삭제
+                  </Button>
+                </>
             }
           </Box>
         </Paper>
