@@ -26,6 +26,8 @@ import useCustomLogin from "../../hooks/useCustomLogin.jsx";
 import DateUtil from "../../util/dateUtil.js";
 import CommentComponent from "../comment/CommentComponent.jsx";
 import {increaseViewCount, readViewCount} from "../../api/boardViewCountApi.js";
+import {count, like, readLike, unlike} from "../../api/boardLikeApi.js";
+import log from "eslint-plugin-react/lib/util/log.js";
 
 const initState = {
   userId: 0,
@@ -60,18 +62,26 @@ const BoardDetailComponent = () => {
   const {isLogin, moveToLoginReturn, loginState} = useCustomLogin()
   const loginUserId = loginState.id
   const [view, setView] = useState(0)
+  const [likeCount, setLikeCount] = useState(0)
+  const [isLike, setIsLike] = useState(false)
+
 
   useEffect(() => {
+    count(boardId).then(data => {
+    setLikeCount(data.data)
+    })
     increaseViewCount({
       boardId: boardId,
       userId: loginUserId,
     }).then(data => {
-      console.log(data)
       readViewCount({boardId}).then(data => {
         setView(data)
       })
     })
-  }, [])
+  }, [boardId,isLike])
+
+
+
 
   if (!isLogin) {
     return moveToLoginReturn()
@@ -91,11 +101,6 @@ const BoardDetailComponent = () => {
   const {data, isSuccess} = useQuery({
     queryKey: ['board', boardId],
     queryFn: () => getBoard(boardId),
-  });
-
-  const viewQuery = useQuery({
-    queryKey: ['boardViewCount', boardId],
-    queryFn: () => readViewCount({boardId}),
   });
 
   const board = data || initState
@@ -149,6 +154,26 @@ const BoardDetailComponent = () => {
 
       })
     }
+  }
+
+  const handleClickLike = () => {
+    const params = {
+      boardId: boardId,
+      userId: loginUserId,
+    }
+    readLike(params).then(data => {
+      if (data.data) {
+        like(params).then(data => {
+          console.log('like',data)
+          setIsLike(!isLike)
+        })
+      } else {
+        unlike(params).then(data => {
+          console.log('unlike',data)
+          setIsLike(!isLike)
+        })
+      }
+    })
   }
 
   const handleClickClose = () => {
@@ -247,28 +272,39 @@ const BoardDetailComponent = () => {
           }
           <Box sx={{
             display: 'flex',
-            justifyContent: 'flex-end',
+            justifyContent: 'space-between', // 양쪽 끝에 요소를 배치
             gap: 1,
             marginTop: 3
           }}>
-            <Button onClick={() => moveToList(
-                {page, size, searchKeyword, searchSort})} variant="outlined"
-                    color="primary">
-              목록
+            {/* 왼쪽 끝에 하트 버튼 */}
+            <Button variant="outlined" color="secondary"
+                    onClick={handleClickLike}
+            >
+              {likeCount} ❤️
             </Button>
-            {loginUserId === board.userId &&
-                <>
-                  <Button onClick={handleClickUpdate} variant="outlined"
-                          color="primary">
-                    수정
-                  </Button>
-                  <Button onClick={handleClickDelete} variant="outlined"
-                          color="error">
-                    삭제
-                  </Button>
-                </>
-            }
+
+            {/* 오른쪽 끝에 목록, 수정, 삭제 버튼들 */}
+            <Box sx={{display: 'flex', gap: 1}}>
+              <Button onClick={() => moveToList(
+                  {page, size, searchKeyword, searchSort})} variant="outlined"
+                      color="primary">
+                목록
+              </Button>
+              {loginUserId === board.userId && (
+                  <>
+                    <Button onClick={handleClickUpdate} variant="outlined"
+                            color="primary">
+                      수정
+                    </Button>
+                    <Button onClick={handleClickDelete} variant="outlined"
+                            color="error">
+                      삭제
+                    </Button>
+                  </>
+              )}
+            </Box>
           </Box>
+
         </Paper>
         <CommentComponent/>
         <ModalComponent
