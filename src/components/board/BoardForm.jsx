@@ -112,7 +112,6 @@ function BoardForm({id, isEdit = false}) {
   }
 
   const handleClickSave = () => {
-    console.log(value)
     const {newContent} = makeContentFrom(uploadImage, value);
 
     const formData = new FormData();
