@@ -1,11 +1,21 @@
-const SERVER_HOST = import.meta.env.VITE_API_SERVER_HOST
+import axios from "axios";
+import {SERVER_HOST} from "@/constants/index.js";
 
-export const API_SERVER_HOST = `${SERVER_HOST}:28080`
 
-export const USER = `${API_SERVER_HOST}/users`
+const axiosInstance = axios.create({
+  baseURL: `${SERVER_HOST}:28080`,
+  withCredentials: true
+})
 
-export const BOARD = `${API_SERVER_HOST}/boards`
 
-export const COMMENT = `${API_SERVER_HOST}/comment`
 
-export const IMAGE = `${API_SERVER_HOST}/images`
+export {axiosInstance};
+// export const API_SERVER_HOST = `${SERVER_HOST}:28080`
+//
+// export const USER = `${API_SERVER_HOST}/users`
+//
+// export const BOARD = `${API_SERVER_HOST}/boards`
+//
+// export const COMMENT = `${API_SERVER_HOST}/comment`
+//
+// export const IMAGE = `${API_SERVER_HOST}/images`

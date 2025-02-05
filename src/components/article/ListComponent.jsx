@@ -1,7 +1,32 @@
 import React from 'react';
 import {Link} from "react-router-dom";
+import {useQuery} from "@tanstack/react-query";
+import useCustomMove from "../../hooks/useCustomMove.jsx";
+import {getList} from "../../api/articleApi.js";
 
 function ListComponent(props) {
+
+  const {page, size, refresh,moveToWrite} = useCustomMove()
+
+  const listQuery = useQuery({
+    queryKey: ['articles/list', {
+      category: "FOOD",
+      page: page,
+      size: size,
+      refresh: refresh,
+    }],
+    queryFn: () => {
+      getList({
+        category: "FOOD",
+        page: page,
+        size: size,
+      })
+    }
+  });
+
+  if (listQuery.isSuccess) {
+    console.log(listQuery.data)
+  }
   return (
 
 
@@ -14,7 +39,7 @@ function ListComponent(props) {
                   <div
                       className="container max-w-4xl mx-auto pb-10 flex justify-end items-center px-3">
                     <button
-                        // onClick={moveToWrite}
+                        onClick={moveToWrite}
                         className="block mb-4 px-3 py-2 text-xs font-bold no-underline hover:shadow bg-black rounded-lg text-white">
                       posting
                     </button>

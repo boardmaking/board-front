@@ -1,7 +1,7 @@
 import {Button} from "@mui/material";
 import {styled} from "@mui/material/styles";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import {useRef} from "react";
+import {useEffect, useRef} from "react";
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -16,12 +16,13 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 
-export default function FileUploadComponent({handleChangeUploadFile,name="files"}) {
+export default function FileUploadComponent({handleChangeFile,name="files"}) {
 
   const fileInputRef = useRef(null)
 
   const handleClearInput = () => {
     if (fileInputRef.current) {
+      console.log('파일테스트')
       fileInputRef.current.value = ''; // 파일 입력 리셋
     }
   }
@@ -41,7 +42,7 @@ export default function FileUploadComponent({handleChangeUploadFile,name="files"
             ref={fileInputRef}
             name={name}
             type="file"
-            onChange={handleChangeUploadFile}
+            onChange={handleChangeFile}
             multiple
         />
       </Button>

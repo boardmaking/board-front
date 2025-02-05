@@ -87,6 +87,7 @@ export default function TableComponent() {
 
 
     useEffect(() => {
+        console.log(data)
         if (data?.data) {
             setPage(data.data.number)
             setRowsPerPage(data.data.size)

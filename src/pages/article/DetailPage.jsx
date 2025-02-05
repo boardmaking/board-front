@@ -1,5 +1,5 @@
 import React from 'react';
-import DetailComponent from "../../components/column/DetailComponent.jsx";
+import DetailComponent from "../../components/article/DetailComponent.jsx";
 
 function DetailPage(props) {
   return (

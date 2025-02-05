@@ -3,14 +3,15 @@ import {lazy, Suspense} from "react";
 import {Box, CircularProgress} from "@mui/material";
 import boardRouter from "./boardRouter.jsx";
 import userRouter from "./userRouter.jsx";
-import columnRouter from "./columnRouter.jsx";
+import articleRouter from "./articleRouter.jsx";
 
 const Loading = <Box sx={{ display: 'flex' }}><CircularProgress /></Box>
 const MainIndex = lazy(()=>import("../pages/MainIndexPage.jsx"))
 const BoardIndex = lazy(()=>import("../pages/board/BoardIndexPage.jsx"))
-const ColumnIndex = lazy(()=>import("../pages/column/IndexPage.jsx"))
+const ArticleIndex = lazy(()=>import("../pages/article/IndexPage.jsx"))
 const UserIndex = lazy(()=>import("../pages/user/UserIndexPage.jsx"))
 const Error404Page = lazy(()=>import("../pages/error/Error404.jsx"))
+const WifiPage = lazy(()=>import("../pages/wifi/WifiPage.jsx"))
  const root = createBrowserRouter([
    {path:'/',
      element:<Suspense fallback={Loading}><MainIndex/></Suspense>
@@ -26,13 +27,16 @@ const Error404Page = lazy(()=>import("../pages/error/Error404.jsx"))
      children:userRouter()
    },
    {
-     path:'/columns',
-     element:<Suspense fallback={Loading}><ColumnIndex/></Suspense>,
-     children:columnRouter()
+     path:'/articles',
+     element:<Suspense fallback={Loading}><ArticleIndex/></Suspense>,
+     children:articleRouter()
    },
    {
      path:'/*',
      element:<Suspense fallback={Loading}><Error404Page/></Suspense>
+   },{
+    path:'/wifi',
+    element:<Suspense fallback={Loading}><WifiPage/></Suspense>
    }
  ])
 

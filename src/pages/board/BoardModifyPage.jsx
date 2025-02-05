@@ -1,10 +1,11 @@
 import React from 'react';
-import ModifyComponent from "../../components/board/ModifyComponent.jsx";
+import {useParams} from "react-router-dom";
+import BoardForm from "../../components/board/BoardForm.jsx";
 
-
-function BoardModifyPage(props) {
+function BoardModifyPage() {
+    const {id} = useParams();
     return (
-        <ModifyComponent/>
+        <BoardForm id={id} isEdit />
     );
 }
 

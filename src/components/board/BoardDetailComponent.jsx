@@ -10,8 +10,7 @@ import {
   Paper
 } from "@mui/material";
 import {useParams} from "react-router-dom";
-import {useMutation, useQuery} from "@tanstack/react-query";
-import {getBoard, postDeleteBoard, postDownload} from "../../api/boardApi.js";
+import {postDownload} from "../../api/boardApi.js";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
 import {toast} from "react-toastify";
 import {styled} from "@mui/material/styles";
@@ -27,19 +26,9 @@ import DateUtil from "../../util/dateUtil.js";
 import CommentComponent from "../comment/CommentComponent.jsx";
 import {increaseViewCount, readViewCount} from "../../api/boardViewCountApi.js";
 import {count, like, readLike, unlike} from "../../api/boardLikeApi.js";
-import log from "eslint-plugin-react/lib/util/log.js";
-
-const initState = {
-  userId: 0,
-  boardId: 0,
-  username: "",
-  title: "",
-  content: "",
-  createdAt: "",
-  classifiaction: "",
-  originalFileNameList: [],
-  uploadedFileNameList: [],
-}
+import useGetBoard from "../../hooks/queries/useGetBoard.js";
+import useMutateDeleteBoard from "../../hooks/queries/useMutateDeleteBoard.js";
+import useBoardDetailStore from "../../store/useBoardDetailStore.js";
 
 const BoardDetailComponent = () => {
 
@@ -60,15 +49,20 @@ const BoardDetailComponent = () => {
   const [isLoading, setIsLoading] = useState({})
   const [hasDownloaded, setHasDownloaded] = useState({})
   const {isLogin, moveToLoginReturn, loginState} = useCustomLogin()
+  const deleteBoard = useMutateDeleteBoard()
+  const {data: board, isSuccess, isPending, isError} = useGetBoard(boardId)
+  const {setBoardDetail} = useBoardDetailStore()
+
   const loginUserId = loginState.id
+
   const [view, setView] = useState(0)
   const [likeCount, setLikeCount] = useState(0)
   const [isLike, setIsLike] = useState(false)
 
-
   useEffect(() => {
+    board && setBoardDetail(board)
     count(boardId).then(data => {
-    setLikeCount(data.data)
+      setLikeCount(data.data)
     })
     increaseViewCount({
       boardId: boardId,
@@ -78,41 +72,32 @@ const BoardDetailComponent = () => {
         setView(data)
       })
     })
-  }, [boardId,isLike])
+  }, [boardId, isLike, board])
 
-
-
+  if (isPending || isError) {
+    return <></>
+  }
 
   if (!isLogin) {
     return moveToLoginReturn()
   }
-
-  const boardMutation = useMutation({
-    mutationFn: postDeleteBoard,
-    onSuccess: () => {
-      toast.success("삭제되었습니다.");
-      moveToList({page: 0});
-    },
-    onError: () => {
-      toast.error("본인만 삭제할 수 있습니다.");
-    }
-  });
-
-  const {data, isSuccess} = useQuery({
-    queryKey: ['board', boardId],
-    queryFn: () => getBoard(boardId),
-  });
-
-  const board = data || initState
 
   const handleClickDelete = () => {
     if (!loginState) {
       toast.error("로그인 후 삭제할 수 있습니다.");
       return;
     }
-    boardMutation.mutate({
+
+    const body = {
       userId: loginState.id,
       boardId: boardId
+    }
+
+    deleteBoard.mutate(body, {
+      onSuccess: () => {
+        toast.success("삭제되었습니다.");
+        moveToList({page, size, searchKeyword, searchSort})
+      }
     });
   };
 
@@ -164,12 +149,12 @@ const BoardDetailComponent = () => {
     readLike(params).then(data => {
       if (data.data) {
         like(params).then(data => {
-          console.log('like',data)
+          console.log('like', data)
           setIsLike(!isLike)
         })
       } else {
         unlike(params).then(data => {
-          console.log('unlike',data)
+          console.log('unlike', data)
           setIsLike(!isLike)
         })
       }
@@ -181,79 +166,39 @@ const BoardDetailComponent = () => {
   }
 
   return (
-      <Box sx={{maxWidth: '800px', margin: '0 auto', padding: '20px'}}>
+      <Box sx={styles.container}>
         <Paper elevation={3} sx={{padding: 3, marginBottom: 3}}>
           <h2>{board.title}</h2>
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            color: 'text.secondary',
-            marginBottom: 2
-          }}>
+
+          <Box sx={styles.writerInfoContainer}>
             <span>작성자: {board.username}</span>
-            <ul style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'flex-end',
-              alignItems: 'flex-end',  // 오른쪽 끝 정렬
-              margin: 0, // 기본적으로 ul에는 margin이 있을 수 있으므로 제거
-              padding: 0  // padding도 기본적으로 있을 수 있으므로 제거
-            }}>
+            <ul style={styles.boardInfo}>
               <span>조회수: {view}</span>
               <span>작성일: {DateUtil.formatDateFrom(board.createdAt)}</span>
             </ul>
           </Box>
+
           <Divider sx={{margin: '20px 0'}}/>
-          <Box
-              sx={{
-                minHeight: '200px',
-                '& img': {
-                  maxWidth: '100%',
-                  height: 'auto',
-                  display: 'block',
-                  margin: '1em auto',
-                  objectFit: 'contain',
-                  maxHeight: '600px'
-                },
-                '& p': {
-                  margin: '1em 0',
-                  wordWrap: 'break-word'
-                },
-                '& ul, & ol': {
-                  marginLeft: '2em'
-                },
-                '& blockquote': {
-                  borderLeft: '4px solid #ddd',
-                  marginLeft: 0,
-                  paddingLeft: '1em'
-                }
-              }}
-              dangerouslySetInnerHTML={{__html: board.content}}
-          />
-          {isSuccess && data.uploadFileNameList.length !== 0 ?
+          <Box sx={styles.contentViewer}
+               dangerouslySetInnerHTML={{__html: board.content}}/>
+          {isSuccess && board.uploadFileNameList.length !== 0 ?
               <Demo>
                 <List>
                   {board.uploadFileNameList.map((uploadFileName, index) => (
                       <ListItem key={index}
                                 secondaryAction={
-                                  <IconButton
-                                      disabled={isLoading[index]
-                                          || hasDownloaded[index]}
-                                      onClick={() => handleClickDownload(
-                                          uploadFileName, index)}
-                                      name={uploadFileName}
-                                      edge="end"
-                                      aria-label="download">
-                                    {isLoading[index] ?
-                                        <PauseIcon/>
+                                  <IconButton disabled={isLoading[index]
+                                      || hasDownloaded[index]}
+                                              onClick={() => handleClickDownload(
+                                                  uploadFileName, index)}
+                                              name={uploadFileName}
+                                              edge="end"
+                                              aria-label="download">
+                                    {isLoading[index] ? <PauseIcon/>
                                         : hasDownloaded[index] ?
-                                            <CheckCircleIcon/>
-                                            :
+                                            <CheckCircleIcon/> :
                                             <FileDownloadIcon
-                                                name={uploadFileName}
-                                            />
-                                    }
+                                                name={uploadFileName}/>}
                                   </IconButton>
                                 }
                       >
@@ -270,15 +215,12 @@ const BoardDetailComponent = () => {
                 </List>
               </Demo> : <></>
           }
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'space-between', // 양쪽 끝에 요소를 배치
-            gap: 1,
-            marginTop: 3
-          }}>
+          <Box sx={styles.likeContainer}>
             {/* 왼쪽 끝에 하트 버튼 */}
-            <Button variant="outlined" color="secondary"
-                    onClick={handleClickLike}
+            <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleClickLike}
             >
               {likeCount} ❤️
             </Button>
@@ -292,12 +234,16 @@ const BoardDetailComponent = () => {
               </Button>
               {loginUserId === board.userId && (
                   <>
-                    <Button onClick={handleClickUpdate} variant="outlined"
-                            color="primary">
+                    <Button
+                        onClick={handleClickUpdate}
+                        variant="outlined"
+                        color="primary">
                       수정
                     </Button>
-                    <Button onClick={handleClickDelete} variant="outlined"
-                            color="error">
+                    <Button
+                        onClick={handleClickDelete}
+                        variant="outlined"
+                        color="error">
                       삭제
                     </Button>
                   </>
@@ -316,5 +262,58 @@ const BoardDetailComponent = () => {
       </Box>
   );
 };
+
+const styles = {
+  container: {
+    maxWidth: '800px',
+    margin: '0 auto',
+    padding: '20px'
+  },
+  writerInfoContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    color: 'text.secondary',
+    marginBottom: 2
+  },
+  contentViewer: {
+    minHeight: '200px',
+    '& img': {
+      maxWidth: '100%',
+      height: 'auto',
+      display: 'block',
+      margin: 0,
+      // margin: '1em auto',
+      objectFit: 'contain',
+      maxHeight: '600px'
+    },
+    '& p': {
+      margin: '1em 0',
+      wordWrap: 'break-word'
+    },
+    '& ul, & ol': {
+      marginLeft: '2em'
+    },
+    '& blockquote': {
+      borderLeft: '4px solid #ddd',
+      marginLeft: 0,
+      paddingLeft: '1em'
+    }
+  },
+  boardInfo: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',  // 오른쪽 끝 정렬
+    margin: 0, // 기본적으로 ul에는 margin이 있을 수 있으므로 제거
+    padding: 0  // padding도 기본적으로 있을 수 있으므로 제거
+  },
+  likeContainer: {
+    display: 'flex',
+    justifyContent: 'space-between', // 양쪽 끝에 요소를 배치
+    gap: 1,
+    marginTop: 3
+  }
+}
 
 export default BoardDetailComponent;
