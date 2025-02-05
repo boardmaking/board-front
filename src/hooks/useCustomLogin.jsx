@@ -1,6 +1,6 @@
 import {Navigate, useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {loginPostAsync, logout, logoutPostAsync} from "../slices/loginSlice";
+import {loginPostAsync, logout} from "../slices/loginSlice";
 
 const useCustomLogin = () => {
   const navigate = useNavigate()
@@ -14,8 +14,9 @@ const useCustomLogin = () => {
   const isNotAdmin = () => {
     if (isLogin) {
       const roles = loginState.roles
-      for (let i = 0; i < roles.roles.length; i++) {
-        if (roles.roles[i] === 'ADMIN') {
+      for (let i = 0; i < roles.length; i++) {
+        if (roles[i] === 'ROLE_ADMIN') {
+          console.log(roles[i])
           return false
         }
       }
@@ -28,6 +29,7 @@ const useCustomLogin = () => {
   }
 
   const doLogin = async (loginParam) => {
+    console.log(loginParam)
     const action = await dispatch(loginPostAsync(loginParam))
     return action.payload
   }

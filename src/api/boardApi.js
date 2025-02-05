@@ -1,48 +1,56 @@
-import {BOARD} from "./config.js";
-import jwtAxios from "../util/jwtUtil.jsx";
-import axios from "axios";
+import {axiosInstance} from "@/api/config.js";
+import jwtAxios from "@/util/jwtUtil.jsx";
 
-export const getList = async (param) => {
-  return (await jwtAxios.get(`${BOARD}`, {
-    params: {
-      searchSort: param.searchSort,
-      searchKeyword: param.searchKeyword,
-      page: param.page,
-      size: param.size
-    }
-  })).data
+const getList = async (body) => {
+  const {data} = await jwtAxios.get(`/boards`, {
+    params: body
+  });
+
+  return data
 }
 
-export const postBoard = async (params) => {
-  return (await jwtAxios.post(`${BOARD}`, params)).data
+const postBoard = async (params) => {
+  console.log('params', params)
+  return (await jwtAxios.post(`/boards`, params)).data
 }
 
-export const getBoard = async (boardId) => {
-  return (await jwtAxios.get(`${BOARD}/${boardId}`)).data
+const getBoard = async (boardId) => {
+  return (await jwtAxios.get(`/boards/${boardId}`)).data
 }
 
-export const postDeleteBoard = async (params) => {
-  return (await jwtAxios.delete(`${BOARD}`, {data: params})).data
+const postDeleteBoard = async (params) => {
+  return (await jwtAxios.delete(`/boards`, {data: params})).data
 }
 
-export const postModify = async (params) => {
-  return (await jwtAxios.put(`${BOARD}`, params)).data
+const postModify = async (params) => {
+  const {data} = await jwtAxios.put(`/boards`, params);
+  return data
 }
 
-export const uploadImage = async (params) => {
-  return (await jwtAxios.post(`${BOARD}/upload`, params, {
+const uploadImage = async (params) => {
+  return (await jwtAxios.post(`/boards/upload`, params, {
     headers: {
       'Content-Type': 'multipart/form-data',
     }
   })).data
 }
-export const postDownload = async (params) => {
+const postDownload = async (params) => {
   console.log(params)
-  return (await axios.get(`${BOARD}/files/${params.fileName}`, {
-            responseType: 'blob',
-            params: {
-              fileType: params.fileType,
-            },
-          })).data
+  return (await axiosInstance.get(`/boards/files/${params.fileName}`, {
+    responseType: 'blob',
+    params: {
+      fileType: params.fileType,
+    },
+  })).data
 
 }
+
+export {
+  getList,
+  getBoard,
+  postBoard,
+  postDeleteBoard,
+  postModify,
+  uploadImage,
+  postDownload
+};

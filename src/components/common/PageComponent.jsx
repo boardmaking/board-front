@@ -1,9 +1,7 @@
-import React, {useEffect, useState} from 'react';
-
+import React from 'react';
 
 function PageComponent({serverData, movePage}) {
 
-  // const [size, setSize] = useState(12)
   const size = 12;
   const {pageable,totalPages} = serverData
 
@@ -19,14 +17,6 @@ function PageComponent({serverData, movePage}) {
     pageNumberList.push(pageNumber)
   }
 
-  const handleChangeSize = (e) => {
-    const {value} = e.target
-    // setSize(value)
-  }
-
-  /*useEffect(() => {
-    movePage({size})
-  },[size])*/
 
   return (
       <div
@@ -58,7 +48,7 @@ function PageComponent({serverData, movePage}) {
           Per page:
           <select
               name="size"
-              onChange={handleChangeSize}
+              // onChange={handleChangeSize}
               className="bg-white border rounded-lg w-24 h-8 ml-1">
             <option value={12}>12</option>
             <option value={24}>24</option>

@@ -1,5 +1,4 @@
-import axios from "axios";
-import {API_SERVER_HOST} from "./config.js";
+import {axiosInstance} from "./config.js";
 
 const naver_client_id = import.meta.env.VITE_OAUTH2_NAVER_CLIENT_ID
 const naver_redirect_url = import.meta.env.VITE_NAVER_REDIRECT_URI
@@ -14,6 +13,6 @@ export const getNaverAccessToken = async (authCode) => {
     code: authCode,
   }
 
-  return (await axios.post(`${API_SERVER_HOST}/oauth2/naver`, params,
+  return (await axiosInstance.post(`/oauth2/naver`, params,
       header)).data
 }

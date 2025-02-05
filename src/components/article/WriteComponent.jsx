@@ -2,28 +2,18 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import {
-  Avatar,
-  Button,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  TextField,
-} from '@mui/material';
+import {Button, TextField,} from '@mui/material';
 import {useMutation} from '@tanstack/react-query';
-import {postBoard, uploadImage} from '../../api/boardApi.js';
-import TextFieldComponent from '../common/TextFieldComponent.jsx';
-import useCustomMove from '../../hooks/useCustomMove.jsx';
+import {uploadImage} from '@/api/boardApi.js';
+import TextFieldComponent from '@/common/TextFieldComponent.jsx';
 import {toast} from 'react-toastify';
-import FileUploadComponent from '../common/FileUploadComponent.jsx';
-import IconButton from '@mui/material/IconButton';
-import FolderIcon from '@mui/icons-material/Folder';
-import ClearIcon from '@mui/icons-material/Clear';
-import ModalComponent from '../common/ModalComponent.jsx';
-import useCustomLogin from '../../hooks/useCustomLogin.jsx';
-import ClassificationComponent from './ClassificationComponent.jsx';
-import {base64ToBlob} from '../../util/fileUtil.js';
-import {BOARD} from "../../api/config.js";
+import ModalComponent from '@/common/ModalComponent.jsx';
+import useCustomLogin from '@/hooks/useCustomLogin.jsx';
+import {base64ToBlob} from '@/util/fileUtil.js';
+import CategoryComponent from "./CategoryComponent.jsx";
+import {postArticle} from "@/api/articleApi.js";
+import useCustomMove from "@/hooks/useCustomMove.jsx";
+import {SERVER_HOST} from "../../constants/index.js";
 
 const formats = [
   'font',
@@ -58,27 +48,21 @@ const WriteComponent = () => {
   const titleRef = useRef(null);
   const [tempImages, setTempImages] = useState(new Map());
   const [fileError, setFileError] = useState(null);
-  const {isLogin, moveToLoginReturn} = useCustomLogin()
-  const [board, setBoard] = useState({
+  const {isLogin, moveToLoginReturn,loginState} = useCustomLogin()
+  const [article, setArticle] = useState({
     email: '',
     title: '',
     content: '',
-    username: '',
-    files: [],
-    savePath: '',
-    originalName: '',
-    saveName: '',
-    classification: 'INFO',
+    category: 'FOOD',
   });
-  const [fileStore, setFileStore] = useState([]);
   const [open, setOpen] = useState(false);
 
   if (!isLogin) {
     return moveToLoginReturn()
   }
 
-  const boardMutation = useMutation({
-    mutationFn: (board) => postBoard(board),
+  const mutation = useMutation({
+    mutationFn: (article) => postArticle(article),
   });
 
   const validateFile = (file) => {
@@ -100,14 +84,13 @@ const WriteComponent = () => {
   };
 
   const handleClassificationChange = (event) => {
-    setBoard({
-      ...board,
-      classification: event.target.value,
+    setArticle({
+      ...article,
+      category: event.target.value,
     });
   };
 
   const handleEditorChange = async (content) => {
-
     const imgTagRegex = /<img[^>]*>/g;
     let updatedContent = content;
     const imgTags = content.match(imgTagRegex);
@@ -129,7 +112,7 @@ const WriteComponent = () => {
             try {
               const data = await uploadImage(formData);
               updatedContent = contentWithoutImages.replace(imagePlace,
-                  `<img src="${BOARD}/files/${data}?fileType=IMAGE" alt="${uuid}" />`);
+                  `<img src="${SERVER_HOST}:28080/boards/files/${data}?fileType=IMAGE" alt="${uuid}" />`);
               resolve();
             } catch (err) {
               reject(err);
@@ -143,6 +126,7 @@ const WriteComponent = () => {
       await Promise.all(imageUploadPromises);
       setValues(updatedContent);
     } else {
+      console.log(content)
       setValues(content);
     }
   };
@@ -187,10 +171,9 @@ const WriteComponent = () => {
     if (cookieValue) {
       const userInfo = JSON.parse(
           decodeURIComponent(cookieValue.split('=')[1]));
-      setBoard((prevBoard) => ({
+      setArticle((prevBoard) => ({
         ...prevBoard,
         email: userInfo.email,
-        username: userInfo.username,
       }));
     }
 
@@ -198,8 +181,8 @@ const WriteComponent = () => {
   }, []);
 
   const handleTitleChange = (event) => {
-    setBoard({
-      ...board,
+    setArticle({
+      ...article,
       title: event.target.value,
     });
   };
@@ -224,7 +207,7 @@ const WriteComponent = () => {
   );
 
   const handleClickWrite = async () => {
-    if (!board.title.trim()) {
+    if (!article.title.trim()) {
       alert('제목을 입력해주세요.');
       return;
     }
@@ -241,26 +224,22 @@ const WriteComponent = () => {
       const TOTAL_FILE_MAX_SIZE = 80 * 1024 * 1024;
       const formData = new FormData();
       let totalFileSize = 0;
-      fileStore.forEach((file) => {
-        totalFileSize += file.size;
-        formData.append('files', file);
-      });
+
 
       if (totalFileSize > TOTAL_FILE_MAX_SIZE) {
         throw new Error(
             `파일 크기가 너무 큽니다. 최대 크기: ${TOTAL_FILE_MAX_SIZE / (1024 * 1024)}MB`);
       }
 
-      formData.append('username', board.username);
-      formData.append('email', board.email);
-      formData.append('title', board.title);
+      console.log(finalContent)
+      formData.append('email', article.email);
+      formData.append('title', article.title);
       formData.append('content', finalContent);
-      formData.append('classification', board.classification);
-
-      await boardMutation.mutateAsync(formData);
+      formData.append('category', article.category);
+      await mutation.mutateAsync(formData);
       toast.success('글이 작성되었습니다.');
       moveToList({
-        page, size, searchKeyword, searchSort
+        page, size,  category:"FOOD"
       })
     } catch (error) {
       console.error('작성 실패:', error.message);
@@ -275,36 +254,9 @@ const WriteComponent = () => {
     }
   };
 
-  const handleClickFileClear = (index) => {
-    const updatedFileStore = fileStore.filter((_, i) => i !== index);
-    setFileStore(updatedFileStore);
 
-    const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  };
 
-  const handleChangeUploadFile = (e) => {
-    const FILE_MAX_SIZE = 20 * 1024 * 1024;
-    try {
-      board[e.target.name] = e.target.files;
-      setBoard({...board});
-      const files = board.files;
-      const fileList = Array.from(files);
-      for (let i = 0; i < fileList.length; i++) {
-        if (fileList[i].size > FILE_MAX_SIZE) {
-          throw new Error(
-              `파일 크기가 너무 큽니다. 최대 크기: ${FILE_MAX_SIZE / (1024 * 1024)}MB`
-          );
-        }
-      }
-      setFileStore((fileStore) => [...fileStore, ...Array.from(files)]);
-    } catch (err) {
-      setFileError(err.message);
-      setOpen(true);
-    }
-  };
+
 
   const handleClickClose = () => {
     setOpen(false);
@@ -319,7 +271,7 @@ const WriteComponent = () => {
       <div style={{display: 'flex', flexDirection: 'column', padding: '20px'}}>
         <TextFieldComponent
             label="작성자"
-            value={board.username}
+            value={loginState.username}
             InputProps={{readOnly: true}}
             variant="outlined"
             fullWidth
@@ -328,7 +280,7 @@ const WriteComponent = () => {
             ref={titleRef}
             style={{marginTop: 10}}
             label="제목"
-            value={board.title}
+            value={article.title}
             onChange={handleTitleChange}
             variant="outlined"
             fullWidth
@@ -337,8 +289,8 @@ const WriteComponent = () => {
             autoFocus
         />
 
-        <ClassificationComponent
-            value={board.classification}
+        <CategoryComponent
+            value={article.category}
             onChange={handleClassificationChange}
         />
 
@@ -354,26 +306,7 @@ const WriteComponent = () => {
           />
         </div>
 
-        <FileUploadComponent handleChangeUploadFile={handleChangeUploadFile}/>
 
-        {fileStore.length > 0
-            ? fileStore.map((uploadFile, index) => (
-                <ListItem key={index} secondaryAction={<IconButton
-                    name={uploadFile.name}
-                    onClick={() => handleClickFileClear(index)}
-                    edge="end"
-                    aria-label="upload">
-                  <ClearIcon name={uploadFile.name}/>
-                </IconButton>}>
-                  <ListItemAvatar>
-                    <Avatar>
-                      <FolderIcon/>
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary={uploadFile.name}/>
-                </ListItem>
-            ))
-            : null}
 
         <Button
             variant="outlined"

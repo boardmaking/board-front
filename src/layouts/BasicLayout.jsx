@@ -27,7 +27,6 @@ export default function BasicLayout({children}) {
   }
 
   const handleClickSearch = () => {
-    console.log(searchCondition)
     moveToList(searchCondition);
   }
 
@@ -100,9 +99,9 @@ export default function BasicLayout({children}) {
                   Posting
                 </Link>
               </div>
-              <Link to="/columns/list"
+              <Link to="/articles/list"
                  className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">
-                Column
+                Article
               </Link>
               <a href="#"
                  className="px-2 md:pl-0 md:mr-3 md:pr-3 text-gray-700 no-underline md:border-r border-gray-400">News</a>

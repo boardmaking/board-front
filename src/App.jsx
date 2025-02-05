@@ -1,30 +1,29 @@
 import root from "./router/root.jsx"
 import {RouterProvider} from "react-router-dom";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {QueryClientProvider} from "@tanstack/react-query";
 import {useEffect} from "react";
 import axios from "axios";
 import "./index.css"
 import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-
-const queryClient = new QueryClient()
+import queryClient from "./api/queryClient.js";
 
 function App() {
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        }
-    }, []);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+  }, []);
 
-    return (
-        <>
-            <ToastContainer />
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={root}/>
-            </QueryClientProvider>
-        </>
-    )
+  return (
+      <>
+        <ToastContainer/>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={root}/>
+        </QueryClientProvider>
+      </>
+  )
 }
 
 export default App

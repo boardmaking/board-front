@@ -1,4 +1,6 @@
-export const base64ToBlob = (base64Data, mimeType = null) => {
+import {v4 as uuidv4} from "uuid";
+
+const base64ToBlob = (base64Data, mimeType = null) => {
   if (!mimeType) {
     const mimeTypeMatch = base64Data.match(/^data:([^;]+);base64,/);
     mimeType = mimeTypeMatch ? mimeTypeMatch[1] : 'image/png';
@@ -15,3 +17,11 @@ export const base64ToBlob = (base64Data, mimeType = null) => {
 
   return new Blob([bytes], { type: mimeType });
 };
+
+function makeFilenameBy(imageType) {
+  return uuidv4() + '.' + imageType;
+}
+
+
+
+export {base64ToBlob,makeFilenameBy};

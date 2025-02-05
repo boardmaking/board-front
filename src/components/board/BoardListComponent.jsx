@@ -1,13 +1,10 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import useCustomLogin from "../../hooks/useCustomLogin.jsx";
-import {useQuery} from "@tanstack/react-query";
 import useCustomMove from "../../hooks/useCustomMove.jsx";
-import {getList} from "../../api/boardApi.js";
 import PageComponent from "../common/PageComponent.jsx";
-import {BOARD} from "../../api/config.js";
 import DateUtil from "../../util/dateUtil.js";
-import {readViewCount} from "../../api/boardViewCountApi.js";
-import {data} from "autoprefixer";
+import {SERVER_HOST} from "../../constants/index.js";
+import useGetBoards from "../../hooks/queries/useGetBoards.js";
 
 const initState = {
   content: [],
@@ -27,27 +24,9 @@ function BoardListComponent() {
 
   const {isLogin, moveToLoginReturn} = useCustomLogin()
   const {moveToList, moveToRead, moveToWrite} = useCustomMove()
-  const {searchSort, searchKeyword, page, size, refresh} = useCustomMove()
 
-  const {data: response} = useQuery({
-    queryKey: ['boards/list', {
-      refresh,
-      searchKeyword,
-      searchSort,
-      page,
-      size,
-    }],
-    queryFn: () =>
-        getList({
-          searchSort,
-          searchKeyword,
-          page,
-          size
-        }),
-    // staleTime:1000 * 5
-  });
-
-  const serverData = response?.data || initState
+  const {data:board} = useGetBoards()
+  const boardData = board?.data || initState
 
   if (!isLogin) {
     return moveToLoginReturn()
@@ -78,7 +57,7 @@ function BoardListComponent() {
           </div>
 
           <div className="container max-w-4xl mx-auto pb-10 flex flex-wrap">
-            {serverData.content.length > 0 ? serverData.content.map(
+            {boardData.content.length > 0 ? boardData.content.map(
                     (item) => (
                         <div key={item.boardId}
                              className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 mb-4">
@@ -88,7 +67,7 @@ function BoardListComponent() {
                               }}
                           >
                             <img
-                                src={`${BOARD}/files/thumbnail_${item.imageNameList[0]}?fileType=IMAGE`}
+                                src={`${SERVER_HOST}:28080/boards/files/thumbnail_${item.imageNameList[0]}?fileType=IMAGE`}
                                 className="w-full h-auto rounded-lg"/>
                           </div>
 
@@ -119,7 +98,7 @@ function BoardListComponent() {
           </div>
 
 
-          <PageComponent serverData={serverData}
+          <PageComponent serverData={boardData}
                          movePage={handleClickPage}></PageComponent>
 
         </div>

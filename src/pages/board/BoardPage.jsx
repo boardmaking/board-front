@@ -1,11 +1,9 @@
 import React from 'react';
-import WriteComponent from "../../components/board/WriteComponent.jsx";
+import BoardForm from "../../components/board/BoardForm.jsx";
 
 function BoardPage(props) {
   return (
-      <div>
-        <WriteComponent/>
-      </div>
+      <BoardForm/>
   );
 }
 

@@ -1,5 +1,4 @@
-import axios from "axios";
-import {API_SERVER_HOST} from "./config.js";
+import {axiosInstance} from "@/api/config.js";
 
 const kakao_client_id = import.meta.env.VITE_OAUTH2_KAKAO_CLIENT_ID
 const kakao_redirect_url = import.meta.env.VITE_KAKAO_REDIRECT_URI
@@ -14,6 +13,6 @@ export const getKakaoAccessToken = async (authCode) => {
     code: authCode,
   }
 
-  return (await axios.post(`${API_SERVER_HOST}/oauth2/kakao`, params,
+  return (await axiosInstance.post(`/oauth2/kakao`, params,
       header)).data
 }
